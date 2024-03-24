@@ -22,7 +22,9 @@ const server = app.listen(PORT, HOST, () => {
 });
 
 process.on('unhandledRejection', function (reason) {
-    console.error(`Unhandled Rejection - Shutting down.: ${reason}`);
-    process.exit(1);
+    server.close(() => {
+        console.error(`Unhandled Rejection - Shutting down.: ${reason}`);
+        process.exit(1);
+    });
 });
 
