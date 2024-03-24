@@ -73,6 +73,7 @@ userSchema.methods.comparePw = async function (providedPw, storedPw) {
 
 
 
+
 const User = mongoose.model('User', userSchema);
 module.exports = User;
 

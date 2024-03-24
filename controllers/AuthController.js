@@ -2,7 +2,6 @@
 
 
 const jwt = require('jsonwebtoken');
-const { promisify } = require('util');
 const User = require('../models/userModel');
 const ApiError = require('../utils/ApiError');
 
@@ -31,7 +30,8 @@ exports.register = async function (req, res, next) {
             passwordConfirm: req.body.passwordConfirm,
         });
         const token = signToken(newUser._id);
-        res.cookie("quizko", token, cookieOptions).status(201).json({
+        if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+        res.cookie("jwt", token, cookieOptions).status(201).json({
             status: 'success',
             data: newUser,
             token
@@ -52,11 +52,12 @@ exports.logIn = async function (req, res, next) {
         if (!email || !password) return next(new ApiError("Morate unjeti e-mail i lozinku prilikom prijave.", 400));
 
         const user = await User.findOne({ email: email }).select('+password');
-        if (!user || !await user.comparePw(password, user.password)) return next(new ApiError(`Neispravan e-mail: "${email}" ili lozinka.`), 401);
+        if (!user || !await user.comparePw(password, user.password)) return next(new ApiError(`Neispravan e-mail: "${email}" ili lozinka.`, 401));
 
 
         const token = signToken(user.id);
-        res.cookie("quizko", token, cookieOptions).status(200).json({
+        if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+        res.cookie("jwt", token, cookieOptions).status(200).json({
             status: 'success',
             user,
             token
@@ -68,29 +69,6 @@ exports.logIn = async function (req, res, next) {
     }
 }
 
-
-//Middleware => Provjera jel user prijavljen
-exports.isLoggedIn = async function (req, res, next) {
-    let token;
-    try {
-        if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-            token = req.headers.authorization.split(" ")[1];
-        }
-
-        if (!token) return next(new ApiError("Niste prijavljeni u aplikaciju.", 403));
-        const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-
-        const currentUser = await User.findById(decoded.id);
-        if (!currentUser) return next(new ApiError('Korisnik ne postoji.', 404));
-
-        req.user = currentUser;
-        next();
-    }
-    catch (err) {
-        console.log(err);
-        return next(new ApiError("Nešto nije u redu.", 500));
-    }
-}
 
 
 //Dohvati moj profil
@@ -104,7 +82,112 @@ exports.getMyProfile = async function (req, res, next) {
         });
     }
     catch (err) {
-        console.log(err);
         return next(new ApiError("Nešto nije u redu.", 500));
     }
+}
+
+
+//Update profila
+exports.updateMe = async function (req, res, next) {
+    try {
+        const user = await User.findByIdAndUpdate(req.user.id, {
+            username: req.body.username
+        }, {
+            runValidators: true,
+            new: true
+        });
+
+        const token = signToken(user._id);
+        if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+        res.cookie("jwt", token, cookieOptions).status(200).json({
+            status: 'success',
+            user,
+            token
+        });
+    }
+    catch (e) {
+        return next(new ApiError("Nešto nije u redu.", 500));
+    }
+}
+
+//Deaktivacija računa
+exports.deactivateMe = async function (req, res, next) {
+    try {
+        await User.findByIdAndUpdate(req.user.id, {
+            isAccountActive: false
+        }, {
+            runValidators: true,
+            new: true
+        });
+        res.status(200).json({
+            status: 'success',
+            message: 'Račun uspješno deaktiviran. Svoj račun možete aktivirati ponovno kada poželite'
+        });
+    }
+    catch (e) {
+        return next(new ApiError("Nešto nije u redu.", 500));
+    }
+}
+
+
+//Reaktivacija računa
+exports.activateMe = async function (req, res, next) {
+    try {
+        await User.findByIdAndUpdate(req.user.id, {
+            isAccountActive: true
+        }, {
+            runValidators: true,
+            new: true
+        });
+        res.status(200).json({
+            status: 'success',
+            message: 'Račun uspješno aktiviran. Možete koristiti ostale značajke aplikacije.'
+        });
+    }
+    catch (e) {
+        return next(new ApiError("Nešto nije u redu.", 500));
+    }
+}
+
+//Promjena lozinke
+exports.changePassword = async function (req, res, next) {
+    try {
+        const { password, passwordNew, passwordRepeat } = req.body;
+        if (!password || !passwordNew || !passwordRepeat) return next(new ApiError('Morate unjeti svoju trenutnu lozinku, novu lozinku, te ponoviti novu lozinku.', 400));
+        const user = await User.findOne({ _id: req.user.id }).select("+password");
+
+
+        if (!await user.comparePw(password, user.password)) return next(new ApiError('Netočna trenutna lozinka.', 400));
+        user.password = passwordNew;
+        user.passwordConfirm = passwordRepeat;
+
+
+        const token = signToken(user._id);
+        if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+
+
+        await user.save({ validateModifiedOnly: true });
+        res.status(200).cookie('jwt', token, cookieOptions).json({
+            status: 'success',
+            token,
+            message: 'Lozinka uspješno promjenjena.'
+        })
+
+    }
+    catch (e) {
+        return next(new ApiError("Nešto nije u redu.", 500));
+    }
+}
+
+
+//Odjava
+exports.logOut = function (req, res) {
+    res.cookie('jwt', '', {
+        expiresIn: new Date(Date.now() + 10 * 1000),
+        httpOnly: true
+    })
+    res.status(200).json({
+        status: 'success',
+        message: 'Uspješno ste se odjavili iz aplikacije.'
+    })
 }
