@@ -12,7 +12,7 @@ process.on('uncaughtException', function (e) {
 
 
 const PORT = process.env.PORT || 3000;
-const HOST = process.env.HOST || 'localhost';
+const HOST = process.env.HOST;
 connectDB(process.env.MONGO_CONNECTION_STRING, process.env.MONGO_PASSWORD);
 
 
