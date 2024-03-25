@@ -39,6 +39,7 @@ exports.register = async function (req, res, next) {
 
     }
     catch (error) {
+        if (error.name === 'ValidationError') return next(new ApiError(error.message, 400));
         return next(new ApiError('Nešto nije u redu.', 500));
     }
 }
@@ -75,7 +76,10 @@ exports.logIn = async function (req, res, next) {
 exports.getMyProfile = async function (req, res, next) {
 
     try {
+
         const user = await User.findById(req.user.id);
+        if (!user) return next(new ApiError("Niste prijavljeni u aplikaciju.", 401));
+
         res.status(200).json({
             status: 'success',
             user
@@ -97,6 +101,8 @@ exports.updateMe = async function (req, res, next) {
             new: true
         });
 
+        if (!user) return next(new ApiError("Korisnik nije pronađen", 404));
+
         const token = signToken(user._id);
         if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
         res.cookie("jwt", token, cookieOptions).status(200).json({
@@ -106,6 +112,9 @@ exports.updateMe = async function (req, res, next) {
         });
     }
     catch (e) {
+        if (e.name === 'ValidationError') return next(new ApiError(e.message, 400));
+        if (e.name === 'DuplicateKeyError') return next(new ApiError(e.message, 400));
+
         return next(new ApiError("Nešto nije u redu.", 500));
     }
 }
@@ -113,15 +122,20 @@ exports.updateMe = async function (req, res, next) {
 //Deaktivacija računa
 exports.deactivateMe = async function (req, res, next) {
     try {
+
+        const user = await User.findById(req.user.id);
+        if (!user.isAccountActive) return next(new ApiError("Već Vam je deaktiviran račun.", 400));
+
         await User.findByIdAndUpdate(req.user.id, {
             isAccountActive: false
         }, {
             runValidators: true,
             new: true
         });
+
         res.status(200).json({
             status: 'success',
-            message: 'Račun uspješno deaktiviran. Svoj račun možete aktivirati ponovno kada poželite'
+            message: 'Račun uspješno deaktiviran. Svoj račun možete aktivirati ponovno kada poželite.'
         });
     }
     catch (e) {
@@ -133,6 +147,10 @@ exports.deactivateMe = async function (req, res, next) {
 //Reaktivacija računa
 exports.activateMe = async function (req, res, next) {
     try {
+
+        const user = await User.findById(req.user.id);
+        if (user.isAccountActive) return next(new ApiError("Već Vam je aktiviran račun.", 400));
+
         await User.findByIdAndUpdate(req.user.id, {
             isAccountActive: true
         }, {
