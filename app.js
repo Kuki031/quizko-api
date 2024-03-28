@@ -10,6 +10,8 @@ const compression = require('compression');
 const hpp = require('hpp');
 const ErrorController = require('./controllers/ErrorController');
 const UserRouter = require('./routes/UserRoutes');
+const CategoryRouter = require('./routes/CategoryRoutes');
+const QuizRouter = require('./routes/QuizRoutes');
 
 
 const app = express();
@@ -41,6 +43,8 @@ app.use(express.urlencoded({
 
 
 app.use('/api/v1/users', UserRouter);
+app.use('/api/v1/categories', CategoryRouter);
+app.use('/api/v1/quizzes', QuizRouter);
 app.use(ErrorController);
 
 module.exports = app;

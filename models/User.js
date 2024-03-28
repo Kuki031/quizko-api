@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         maxLength: 30,
         required: [true, 'Morate unjeti svoje korisničko ime.'],
+        trim: true,
         unique: true,
     },
     email: {
@@ -17,6 +18,7 @@ const userSchema = new mongoose.Schema({
         required: [true, "Morate unjeti svoju e-mail adresu."],
         lowercase: true,
         validate: [validator.isEmail, 'Netočan format e-maila.'],
+        trim: true,
         unique: true,
     },
     isAccountActive: {
@@ -54,6 +56,9 @@ const userSchema = new mongoose.Schema({
     },
     createdAt: Date,
     updatedAt: Date
+}, {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
 });
 userSchema.index({ username: 1, email: 1 }, { unique: true });
 userSchema.plugin(uniqueValidator);
@@ -70,6 +75,13 @@ userSchema.methods.comparePw = async function (providedPw, storedPw) {
     return await bcrypt.compare(providedPw, storedPw);
 }
 
+/**
+ * 1.) User trenutno kao gost ne moze kreirat kvizove, brisat, uredivat
+ * 2.) Moze spremat druge kvizove u svoju kolekciju
+ * 3.) Moze brisat kvizove iz svoje kolekcije
+ * 4.) Moze pregledat kolekciju spremljenih kvizova
+ * 
+ */
 
 
 

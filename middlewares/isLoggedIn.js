@@ -2,7 +2,7 @@
 
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
-const User = require('../models/userModel');
+const User = require('../models/User');
 const ApiError = require('../utils/ApiError');
 
 module.exports = async function (req, res, next) {
@@ -21,6 +21,7 @@ module.exports = async function (req, res, next) {
         next();
     }
     catch (err) {
+        console.log(err);
         return next(new ApiError("Nešto nije u redu.", 500));
     }
 }
