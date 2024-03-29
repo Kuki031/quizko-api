@@ -21,7 +21,9 @@ module.exports = async function (req, res, next) {
         next();
     }
     catch (err) {
-        console.log(err);
+        if (err.name === 'JsonWebTokenError') return next(new ApiError('Neispravan JWT token.', 401));
+        if (err.name === 'TokenExpiredError') return next(new ApiError('JWT token je istekao.', 401));
+
         return next(new ApiError("Nešto nije u redu.", 500));
     }
 }

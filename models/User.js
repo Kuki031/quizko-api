@@ -54,6 +54,12 @@ const userSchema = new mongoose.Schema({
         enum: ['Administrator', 'Moderator', 'Guest'],
         default: 'Guest'
     },
+    saved_quizzes: [
+        {
+            type: mongoose.Schema.ObjectId,
+            ref: 'Quiz'
+        }
+    ],
     createdAt: Date,
     updatedAt: Date
 }, {
@@ -74,14 +80,6 @@ userSchema.pre('save', async function (next) {
 userSchema.methods.comparePw = async function (providedPw, storedPw) {
     return await bcrypt.compare(providedPw, storedPw);
 }
-
-/**
- * 1.) User trenutno kao gost ne moze kreirat kvizove, brisat, uredivat
- * 2.) Moze spremat druge kvizove u svoju kolekciju
- * 3.) Moze brisat kvizove iz svoje kolekcije
- * 4.) Moze pregledat kolekciju spremljenih kvizova
- * 
- */
 
 
 

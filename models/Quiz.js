@@ -2,7 +2,6 @@
 
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
-const apiError = require('../utils/ApiError');
 
 const quizSchema = new mongoose.Schema({
     name: {

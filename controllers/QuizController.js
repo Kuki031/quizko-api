@@ -2,6 +2,7 @@
 
 const Category = require('../models/Category');
 const Quiz = require('../models/Quiz');
+const User = require('../models/User');
 const ApiError = require('../utils/ApiError');
 
 exports.createQuiz = async function (req, res, next) {
@@ -21,7 +22,9 @@ exports.createQuiz = async function (req, res, next) {
             date_to_signup: req.body.date_to_signup,
             created_by: req.user.id
         });
-
+        await User.findByIdAndUpdate(req.user.id, {
+            $push: { saved_quizzes: quiz.id }
+        })
         res.status(201).json({
             status: 'success',
             quiz
