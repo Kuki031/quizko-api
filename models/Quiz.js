@@ -40,6 +40,24 @@ const quizSchema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: 'User'
     },
+    is_in_progress: {
+        type: Boolean,
+        default: false
+    },
+    scoreboard: {
+        name: {
+            type: String,
+            unique: true
+        },
+        num_of_teams: {
+            type: Number,
+            default: 0
+        },
+        teams: [{
+            type: mongoose.Schema.ObjectId,
+            ref: 'Team'
+        }]
+    },
     createdAt: Date
 }, {
     toJSON: { virtuals: true },

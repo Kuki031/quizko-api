@@ -41,11 +41,16 @@ const userSchema = new mongoose.Schema({
         },
         select: false
     },
-    isInTeam: {
+    is_in_team: {
         type: Boolean,
         default: false
     },
-    isCurrentlyInQuiz: {
+    team: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Team',
+        default: null
+    },
+    is_currently_in_quiz: {
         type: Boolean,
         default: false
     },
@@ -58,6 +63,12 @@ const userSchema = new mongoose.Schema({
         {
             type: mongoose.Schema.ObjectId,
             ref: 'Quiz'
+        }
+    ],
+    team_invitations: [
+        {
+            type: mongoose.Schema.ObjectId,
+            ref: 'Team'
         }
     ],
     createdAt: Date,

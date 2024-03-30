@@ -8,19 +8,21 @@ const ApiError = require('../utils/ApiError');
 exports.createQuiz = async function (req, res, next) {
     try {
 
-        //Na "odaberi kategoriju" kad se klikne, pulla sve kategorije iz baze
-        const setCategory = await Category.findById(req.body.category);
+        const setCategory = await Category.findOne({ name: req.body.category });
         if (!setCategory) return next(new ApiError(`Kategorija ne postoji.`, 404));
 
         const quiz = await Quiz.create({
             name: req.body.name,
             description: req.body.description,
-            category: req.body.category,
+            category: setCategory.id,
             is_locked: req.body.is_locked,
             starts_at: req.body.starts_at,
             ends_at: req.body.ends_at,
             date_to_signup: req.body.date_to_signup,
-            created_by: req.user.id
+            created_by: req.user.id,
+            scoreboard: {
+                name: `${req.body.name}-scoreboard`
+            }
         });
         await User.findByIdAndUpdate(req.user.id, {
             $push: { saved_quizzes: quiz.id }

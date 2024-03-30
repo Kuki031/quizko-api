@@ -12,6 +12,7 @@ const ErrorController = require('./controllers/ErrorController');
 const UserRouter = require('./routes/UserRoutes');
 const CategoryRouter = require('./routes/CategoryRoutes');
 const QuizRouter = require('./routes/QuizRoutes');
+const TeamRouter = require('./routes/TeamRoutes');
 
 
 const app = express();
@@ -45,6 +46,7 @@ app.use(express.urlencoded({
 app.use('/api/v1/users', UserRouter);
 app.use('/api/v1/categories', CategoryRouter);
 app.use('/api/v1/quizzes', QuizRouter);
+app.use('/api/v1/teams', TeamRouter);
 app.use(ErrorController);
 
 module.exports = app;
