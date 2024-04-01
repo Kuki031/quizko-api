@@ -17,6 +17,7 @@ teamRouter.route('/delete-team/:id').delete(TeamController.deleteTeam);
 teamRouter.route('/invite-to-team/:id').patch(TeamController.inviteToTeam);
 teamRouter.route('/join-team/:id').patch(checkUserTeamQuizState, TeamController.acceptTeamInvitation);
 teamRouter.route('/leave-team/:id').patch(TeamController.leaveTeam);
+teamRouter.route('/join-quiz/:id').patch(TeamController.joinQuiz);
 teamRouter.route('/:id').get(TeamController.getTeam);
 
 module.exports = teamRouter;

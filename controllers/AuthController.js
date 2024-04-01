@@ -17,6 +17,7 @@ const signToken = function (id) {
     });
 }
 
+const isProductionEnv = () => process.env.NODE_ENV === 'production';
 
 
 
@@ -30,13 +31,12 @@ exports.register = async function (req, res, next) {
             passwordConfirm: req.body.passwordConfirm,
         });
         const token = signToken(newUser._id);
-        if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+        if (isProductionEnv()) cookieOptions.secure = true;
         res.cookie("jwt", token, cookieOptions).status(201).json({
             status: 'success',
             data: newUser,
             token
         });
-
     }
     catch (error) {
         if (error.name === 'ValidationError') return next(new ApiError(error.message, 400));
@@ -57,7 +57,7 @@ exports.logIn = async function (req, res, next) {
 
 
         const token = signToken(user.id);
-        if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+        if (isProductionEnv()) cookieOptions.secure = true;
         res.cookie("jwt", token, cookieOptions).status(200).json({
             status: 'success',
             user,
@@ -104,7 +104,7 @@ exports.updateMe = async function (req, res, next) {
         if (!user) return next(new ApiError("Korisnik nije pronađen", 404));
 
         const token = signToken(user._id);
-        if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+        if (isProductionEnv()) cookieOptions.secure = true;
         res.cookie("jwt", token, cookieOptions).status(200).json({
             status: 'success',
             user,
@@ -181,7 +181,7 @@ exports.changePassword = async function (req, res, next) {
 
 
         const token = signToken(user._id);
-        if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+        if (isProductionEnv()) cookieOptions.secure = true;
 
 
         await user.save({ validateModifiedOnly: true });

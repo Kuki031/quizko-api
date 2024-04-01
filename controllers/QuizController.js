@@ -76,7 +76,7 @@ exports.updateQuiz = async function (req, res, next) {
             runValidators: true,
             new: true
         });
-        if (req.user.id !== quiz.created_by.toString()) return next(new ApiError("Ne možete pristupiti ovoj lokaciji.", 403));
+        if (!req.user.hasCreatedQuiz(req.user, quiz)) return next(new ApiError("Ne možete pristupiti ovoj lokaciji.", 403));
 
 
         res.status(200).json({
@@ -96,7 +96,7 @@ exports.updateQuiz = async function (req, res, next) {
 exports.deleteQuiz = async function (req, res, next) {
     try {
         const quiz = await Quiz.findByIdAndDelete(req.params.id)
-        if (req.user.id !== quiz.created_by.toString()) return next(new ApiError("Ne možete pristupiti ovoj lokaciji.", 403));
+        if (!req.user.hasCreatedQuiz(req.user, quiz)) return next(new ApiError("Ne možete pristupiti ovoj lokaciji.", 403));
 
 
         res.status(204).json({

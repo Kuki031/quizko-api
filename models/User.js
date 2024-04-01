@@ -88,11 +88,14 @@ userSchema.pre('save', async function (next) {
     next();
 })
 
+
 userSchema.methods.comparePw = async function (providedPw, storedPw) {
     return await bcrypt.compare(providedPw, storedPw);
 }
 
-
+userSchema.methods.belongsToTeam = (user) => user.is_in_team;
+userSchema.methods.isInActiveQuiz = (user) => user.is_currently_in_quiz;
+userSchema.methods.hasCreatedQuiz = (user, quiz) => user.id === quiz.created_by.toString();
 
 
 const User = mongoose.model('User', userSchema);

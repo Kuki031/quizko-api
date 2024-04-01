@@ -40,10 +40,6 @@ const quizSchema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: 'User'
     },
-    is_in_progress: {
-        type: Boolean,
-        default: false
-    },
     scoreboard: {
         name: {
             type: String,
@@ -70,6 +66,8 @@ quizSchema.pre('save', function (next) {
     this.createdAt = Date.now();
     next();
 })
+
+quizSchema.methods.hasReachedDeadline = (quiz) => Date.now() > quiz.date_to_signup.getTime();
 
 
 
