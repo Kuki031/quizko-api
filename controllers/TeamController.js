@@ -269,3 +269,37 @@ exports.joinQuiz = async function (req, res, next) {
         return next(new ApiError("Nešto nije u redu.", 500));
     }
 }
+
+exports.leaveQuiz = async function (req, res, next) {
+    try {
+        const quiz = await Quiz.findById(req.params.id);
+        if (!quiz) return next(new ApiError("Kviz ne postoji.", 404));
+        if (!req.user.belongsToTeam(req.user)) return next(new ApiError("Ne pripadate niti jednom timu, te niste prijavljeni u nijedan kviz.", 400));
+
+        if (quiz.isInProgress(quiz, new Date(Date.now()))) return next(new ApiError("Kviz je trenutno u tijeku, ne možete ga napustiti.", 400));
+        if (!req.user.isInActiveQuiz(req.user)) return next(new ApiError("Niste prijavljeni na kviz.", 400));
+
+        if (req.user.belongsToTeam(req.user)) {
+            const team = await Team.findById(req.user.team);
+            if (!team.restrictToLeader(req.user, team)) return next(new ApiError("Samo vođa tima može napustiti kviz.", 403));
+
+            await Promise.all([
+                User.updateMany({ team: team._id }, { is_currently_in_quiz: false }),
+                Quiz.findByIdAndUpdate(req.params.id, {
+                    $pull: { "scoreboard.teams": team.id },
+                    $inc: { "scoreboard.num_of_teams": -1 }
+                }),
+                Team.findByIdAndUpdate(team.id, { is_in_quiz: false })
+            ])
+        }
+
+        res.status(200).json({
+            status: 'success',
+            message: `Napustili ste kviz ${quiz.name}.`
+        })
+
+    }
+    catch (err) {
+        return next(new ApiError("Nešto nije u redu.", 500));
+    }
+}
