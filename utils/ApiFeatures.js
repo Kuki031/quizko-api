@@ -20,12 +20,12 @@ class ApiFeatures {
         return this;
     }
 
-    sort() {
+    sort(defaultSort) {
         if (this.queryString.sort) {
             const sortBy = this.queryString.sort.split(',').join(' ');
             this.query = this.query.sort(sortBy);
         } else {
-            this.query = this.query.sort('-createdAt');
+            this.query = this.query.sort(defaultSort);
         }
 
         return this;
