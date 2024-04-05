@@ -161,3 +161,113 @@ exports.getQuizzesByCategories = async function (req, res, next) {
     }
 };
 
+//Runde
+exports.createNewRoundForQuiz = async function (req, res, next) {
+    try {
+        const quiz = await Quiz.findById(req.params.id);
+        if (!quiz) throw new ApiError("Kviz ne postoji.", 404);
+        if (!req.user.hasCreatedQuiz(req.user, quiz)) throw new ApiError("Niste kreirali ovaj kviz.", 403);
+
+        quiz.rounds.push({
+            name: req.body.name
+        });
+        await quiz.save({ validateModifiedOnly: true });
+
+        res.status(201).json({
+            status: 'success',
+            round: req.body.rounds
+        })
+    }
+
+    catch (err) {
+        if (err) return next(err)
+        return next(new ApiError("Nešto nije u redu.", 500));
+    }
+}
+
+//Uredi rundu (samo ime)
+exports.editRoundForQuiz = async function (req, res, next) {
+    try {
+        const { roundid, quizid } = req.params;
+        const roundInQuiz = await Quiz.findById(quizid);
+
+        if (!roundInQuiz) throw new ApiError(`Kviz ne postoji.`, 404);
+        const round = roundInQuiz.rounds.findIndex(round => round.id === roundid);
+
+        if (round === -1) throw new ApiError(`Runda za kviz ne postoji.`, 404);
+
+        if (!req.user.hasCreatedQuiz(req.user, roundInQuiz)) throw new ApiError("Niste kreirali ovaj kviz, s toga ne možete uređivati rundu kviza.", 403);
+
+        roundInQuiz.rounds[round].name = req.body.name;
+        await roundInQuiz.save();
+        res.status(200).json({
+            status: 'success',
+            round: roundInQuiz.rounds[round]
+        })
+    }
+    catch (err) {
+        if (err) return next(err);
+        return next(new ApiError("Nešto nije u redu.", 500));
+    }
+}
+
+//Izbrisi rundu (obrisat ce ref na question entity, ali ne i pitanja)
+exports.deleteRoundForQuiz = async function (req, res, next) {
+    try {
+        const { roundid, quizid } = req.params;
+        const roundInQuiz = await Quiz.findById(quizid);
+
+        if (!roundInQuiz) throw new ApiError(`Kviz ne postoji.`, 404);
+        const round = roundInQuiz.rounds.findIndex(round => round.id === roundid);
+        if (round === -1) throw new ApiError(`Runda za kviz ne postoji.`, 404);
+        if (!req.user.hasCreatedQuiz(req.user, roundInQuiz)) throw new ApiError("Niste kreirali ovaj kviz, s toga ne možete uređivati rundu kviza.", 403);
+
+        await Quiz.findByIdAndUpdate(quizid, { $pull: { rounds: { _id: roundid } } })
+
+        res.status(204).json({
+            status: 'success',
+            data: null
+        })
+    }
+    catch (err) {
+        if (err) return next(err);
+        return next(new ApiError("Nešto nije u redu.", 500));
+    }
+}
+
+//Dohvati sve runde i populate pitanja za kviz
+exports.getAllRoundsForQuiz = async function (req, res, next) {
+    try {
+        const rounds = await Quiz.findById(req.params.id).select("rounds");
+        res.status(200).json({
+            status: 'success',
+            rounds
+        });
+    }
+    catch (err) {
+        if (err) return next(err);
+        if (err.name === 'RangeError') return next(new ApiError("Nešto nije u redu.", 500));
+    }
+}
+
+//Dohvati jednu rundu
+exports.getSingleRound = async function (req, res, next) {
+    try {
+        const { roundid, quizid } = req.params;
+        const singleQuizRound = await Quiz.findById(quizid);
+
+        if (!singleQuizRound) throw new ApiError(`Kviz ne postoji.`, 404);
+        const round = singleQuizRound.rounds.find(round => round.id === roundid);
+        if (!round) throw new ApiError(`Runda za kviz ne postoji.`, 404);
+        if (!req.user.hasCreatedQuiz(req.user, singleQuizRound)) throw new ApiError("Niste kreirali ovaj kviz, s toga ne možete vidjeti rundu kviza.", 403);
+
+        res.status(200).json({
+            status: 'success',
+            round
+        })
+    }
+    catch (err) {
+        if (err) return next(err);
+        return next(new ApiError("Nešto nije u redu.", 500));
+    }
+}

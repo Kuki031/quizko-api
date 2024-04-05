@@ -70,12 +70,11 @@ const userSchema = new mongoose.Schema({
             type: mongoose.Schema.ObjectId,
             ref: 'Team'
         }
-    ],
-    createdAt: Date,
-    updatedAt: Date
+    ]
 }, {
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }
+    toObject: { virtuals: true },
+    timestamps: true
 });
 userSchema.index({ username: 1, email: 1 }, { unique: true });
 userSchema.plugin(uniqueValidator);

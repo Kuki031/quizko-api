@@ -42,7 +42,8 @@ const teamSchema = new mongoose.Schema({
     }
 }, {
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }
+    toObject: { virtuals: true },
+    timestamps: true
 });
 teamSchema.plugin(uniqueValidator);
 teamSchema.pre('save', function (next) {

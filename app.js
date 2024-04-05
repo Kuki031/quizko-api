@@ -14,7 +14,7 @@ const CategoryRouter = require('./routes/CategoryRoutes');
 const QuizRouter = require('./routes/QuizRoutes');
 const TeamRouter = require('./routes/TeamRoutes');
 const scoreboardRouter = require('./routes/ScoreboardRoutes');
-
+const QuestionRouter = require('./routes/QuestionRoutes');
 
 const app = express();
 
@@ -49,6 +49,7 @@ app.use('/api/v1/categories', CategoryRouter);
 app.use('/api/v1/quizzes', QuizRouter);
 app.use('/api/v1/teams', TeamRouter);
 app.use('/api/v1/scoreboards', scoreboardRouter);
+app.use('/api/v1/questions', QuestionRouter);
 app.use(ErrorController);
 
 module.exports = app;

@@ -54,18 +54,32 @@ const quizSchema = new mongoose.Schema({
             ref: 'Team'
         }]
     },
-    createdAt: Date
+    rounds: [
+        {
+            name: {
+                type: String,
+                maxLength: 60
+            },
+            questions: [
+                {
+                    type: mongoose.Schema.ObjectId,
+                    ref: 'Question'
+                }
+            ],
+        }
+    ],
 }, {
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }
+    toObject: { virtuals: true },
+    timestamps: true
 })
 
 quizSchema.plugin(uniqueValidator);
 quizSchema.pre('save', function (next) {
-
     this.createdAt = Date.now();
     next();
 })
+
 
 quizSchema.methods.hasReachedDeadline = (quiz) => Date.now() > quiz.date_to_signup.getTime();
 quizSchema.methods.isInProgress = (quiz, currentDate) => quiz.starts_at <= currentDate && currentDate < quiz.ends_at;
