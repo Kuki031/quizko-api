@@ -11,12 +11,12 @@ exports.saveQuiz = async function (req, res, next) {
         const quizId = req.params.quizid;
 
         const quiz = await Quiz.findById(quizId);
-        if (!quiz) return next(new ApiError(`Kviz sa ID-em ${quiz.id} ne postoji.`, 404));
+        if (!quiz) throw new ApiError(`Kviz sa ID-em ${quiz.id} ne postoji.`, 404);
 
         const user = await User.findOne({ _id: req.user.id });
 
         const exists = user.saved_quizzes.find(quiz => quiz.toString() === quizId);
-        if (exists) return next(new ApiError('Kviz je već spremljen u kolekciju.', 400));
+        if (exists) throw new ApiError('Kviz je već spremljen u kolekciju.', 400);
 
         await User.findByIdAndUpdate(req.user.id, {
             $push: { saved_quizzes: quizId }
@@ -32,7 +32,7 @@ exports.saveQuiz = async function (req, res, next) {
         })
     }
     catch (err) {
-        return next(new ApiError("Nešto nije u redu.", 500));
+        return next(err);
     }
 }
 
@@ -45,8 +45,7 @@ exports.getSavedQuizzes = async function (req, res, next) {
         })
     }
     catch (err) {
-        return next(new ApiError("Nešto nije u redu.", 500));
-
+        return next(err);
     }
 }
 
@@ -56,12 +55,12 @@ exports.deleteSavedQuiz = async function (req, res, next) {
         const quizId = req.params.quizid;
 
         const quiz = await Quiz.findById(quizId);
-        if (!quiz) return next(new ApiError(`Kviz sa ID-em ${quiz._id} ne postoji.`, 404));
+        if (!quiz) throw new ApiError(`Kviz sa ID-em ${quiz._id} ne postoji.`, 404);
 
         const user = await User.findOne({ _id: req.user.id });
 
         const exists = user.saved_quizzes.find(quiz => quiz.toString() === quizId);
-        if (!exists) return next(new ApiError('Kviz ne postoji u Vašoj kolekciji.', 400));
+        if (!exists) throw new ApiError('Kviz ne postoji u Vašoj kolekciji.', 400);
 
         await User.findByIdAndUpdate(req.user.id, {
             $pull: { saved_quizzes: quizId }
@@ -75,6 +74,6 @@ exports.deleteSavedQuiz = async function (req, res, next) {
         })
     }
     catch (err) {
-        return next(new ApiError("Nešto nije u redu.", 500));
+        return next(err);
     }
 }

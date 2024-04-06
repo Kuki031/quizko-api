@@ -75,11 +75,6 @@ const quizSchema = new mongoose.Schema({
 })
 
 quizSchema.plugin(uniqueValidator);
-quizSchema.pre('save', function (next) {
-    this.createdAt = Date.now();
-    next();
-})
-
 
 quizSchema.methods.hasReachedDeadline = (quiz) => Date.now() > quiz.date_to_signup.getTime();
 quizSchema.methods.isInProgress = (quiz, currentDate) => quiz.starts_at <= currentDate && currentDate < quiz.ends_at;

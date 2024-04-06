@@ -9,7 +9,7 @@ exports.createQuiz = async function (req, res, next) {
     try {
 
         const setCategory = await Category.findOne({ name: req.body.category });
-        if (!setCategory) return next(new ApiError(`Kategorija ne postoji.`, 404));
+        if (!setCategory) throw new ApiError(`Kategorija ne postoji.`, 404);
 
         const quiz = await Quiz.create({
             name: req.body.name,
@@ -34,16 +34,14 @@ exports.createQuiz = async function (req, res, next) {
 
     }
     catch (err) {
-        if (err.name === 'ValidationError') return next(new ApiError(err.message, 400));
-        if (err.name === 'DuplicateKeyError') return next(new ApiError(err.message, 400));
-        return next(new ApiError("Nešto nije u redu.", 500));
+        return next(err);
     }
 }
 
 exports.getQuiz = async function (req, res, next) {
     try {
         const quiz = await Quiz.findById(req.params.id).populate("category");
-        if (!quiz) return next(new ApiError(`Kviz sa ID-em ${req.params.id} ne postoji.`, 404));
+        if (!quiz) throw new ApiError(`Kviz sa ID-em ${req.params.id} ne postoji.`, 404);
 
         res.status(200).json({
             status: 'success',
@@ -51,7 +49,7 @@ exports.getQuiz = async function (req, res, next) {
         })
     }
     catch (err) {
-        return next(new ApiError("Nešto nije u redu.", 500));
+        return next(err);
     }
 }
 
@@ -64,7 +62,7 @@ exports.getAllQuizzes = async function (req, res, next) {
         })
     }
     catch (err) {
-        return next(new ApiError("Nešto nije u redu.", 500));
+        return next(err);
     }
 }
 
@@ -76,7 +74,8 @@ exports.updateQuiz = async function (req, res, next) {
             runValidators: true,
             new: true
         });
-        if (!req.user.hasCreatedQuiz(req.user, quiz)) return next(new ApiError("Ne možete pristupiti ovoj lokaciji.", 403));
+        if (!quiz) throw new ApiError(`Kviz sa ID-em ${req.params.id} ne postoji.`, 404);
+        if (!req.user.hasCreatedQuiz(req.user, quiz)) throw new ApiError("Ne možete pristupiti ovoj lokaciji.", 403);
 
 
         res.status(200).json({
@@ -86,9 +85,7 @@ exports.updateQuiz = async function (req, res, next) {
 
     }
     catch (err) {
-        if (err.name === 'ValidationError') return next(new ApiError(err.message, 400));
-        if (err.name === 'DuplicateKeyError') return next(new ApiError(err.message, 400));
-        return next(new ApiError("Nešto nije u redu.", 500));
+        return next(err);
     }
 }
 
@@ -96,16 +93,17 @@ exports.updateQuiz = async function (req, res, next) {
 exports.deleteQuiz = async function (req, res, next) {
     try {
         const quiz = await Quiz.findByIdAndDelete(req.params.id)
-        if (!req.user.hasCreatedQuiz(req.user, quiz)) return next(new ApiError("Ne možete pristupiti ovoj lokaciji.", 403));
+        if (!quiz) throw new ApiError("Kviz ne postoji.", 404);
+        if (!req.user.hasCreatedQuiz(req.user, quiz)) throw new ApiError("Ne možete pristupiti ovoj lokaciji.", 403);
 
 
         res.status(204).json({
             status: 'success',
-            quiz
+            data: null
         })
     }
     catch (err) {
-        return next(new ApiError("Nešto nije u redu.", 500));
+        return next(err);
     }
 }
 
@@ -118,7 +116,7 @@ exports.getUserQuizzes = async function (req, res, next) {
         })
     }
     catch (err) {
-        return next(new ApiError("Nešto nije u redu.", 500));
+        return next(err);
     }
 }
 
@@ -157,7 +155,7 @@ exports.getQuizzesByCategories = async function (req, res, next) {
         });
     }
     catch (err) {
-        return next(new ApiError("Nešto nije u redu.", 500));
+        return next(err);
     }
 };
 
@@ -171,17 +169,16 @@ exports.createNewRoundForQuiz = async function (req, res, next) {
         quiz.rounds.push({
             name: req.body.name
         });
-        await quiz.save({ validateModifiedOnly: true });
+        await quiz.save();
 
         res.status(201).json({
             status: 'success',
-            round: req.body.rounds
+            round: req.body.name
         })
     }
 
     catch (err) {
-        if (err) return next(err)
-        return next(new ApiError("Nešto nije u redu.", 500));
+        return next(err);
     }
 }
 
@@ -206,8 +203,7 @@ exports.editRoundForQuiz = async function (req, res, next) {
         })
     }
     catch (err) {
-        if (err) return next(err);
-        return next(new ApiError("Nešto nije u redu.", 500));
+        return next(err);
     }
 }
 
@@ -230,8 +226,7 @@ exports.deleteRoundForQuiz = async function (req, res, next) {
         })
     }
     catch (err) {
-        if (err) return next(err);
-        return next(new ApiError("Nešto nije u redu.", 500));
+        return next(err);
     }
 }
 
@@ -239,14 +234,16 @@ exports.deleteRoundForQuiz = async function (req, res, next) {
 exports.getAllRoundsForQuiz = async function (req, res, next) {
     try {
         const rounds = await Quiz.findById(req.params.id).select("rounds");
+
+        if (!rounds) throw new ApiError("Kviz ne postoji.", 404);
+
         res.status(200).json({
             status: 'success',
             rounds
         });
     }
     catch (err) {
-        if (err) return next(err);
-        if (err.name === 'RangeError') return next(new ApiError("Nešto nije u redu.", 500));
+        return next(err);
     }
 }
 
@@ -267,7 +264,6 @@ exports.getSingleRound = async function (req, res, next) {
         })
     }
     catch (err) {
-        if (err) return next(err);
-        return next(new ApiError("Nešto nije u redu.", 500));
+        return next(err);
     }
 }

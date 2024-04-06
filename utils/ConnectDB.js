@@ -8,7 +8,7 @@ module.exports = async function (connection_string, pw) {
         await mongoose.connect(connection_string.replace('<password>', pw));
         console.log('Spajanje s bazom uspješno.');
     }
-    catch (e) {
-        console.error('Spajanje s bazom neuspješno.');
+    catch (err) {
+        console.error(`Spajanje s bazom neuspješno ${err.message}`);
     }
 }

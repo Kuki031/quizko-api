@@ -26,7 +26,6 @@ exports.createQuestionForRound = async function (req, res, next) {
         if (!targetRound) throw new ApiError("Runda za kviz ne postoji.", 404);
 
         targetRound.questions.push(newQuestion.id);
-        targetRound.num_of_questions++;
         await quiz.save();
 
         res.status(201).json({
@@ -36,8 +35,6 @@ exports.createQuestionForRound = async function (req, res, next) {
 
     }
     catch (err) {
-        if (err.name === 'ValidationError') return next(new ApiError("Pitanje već postoji.", 400));
-        if (err.statusCode === undefined) return next(new ApiError("Nešto nije u redu.", 500));
         return next(err);
     }
 }
@@ -51,13 +48,14 @@ exports.editQuestion = async function (req, res, next) {
             num_of_points: req.body.num_of_points
         }, { runValidators: true, new: true });
 
+        if (!editQuestion) throw new ApiError("Pitanje ne postoji.", 404);
+
         res.status(200).json({
             status: 'success',
             editQuestion
         })
     }
     catch (err) {
-        if (err.statusCode === undefined) return next(new ApiError("Nešto nije u redu.", 500));
         return next(err);
     }
 }
@@ -82,7 +80,6 @@ exports.getAllQuestionsFromRound = async function (req, res, next) {
         })
     }
     catch (err) {
-        if (err.statusCode === undefined) return next(new ApiError("Nešto nije u redu.", 500));
         return next(err);
     }
 }
@@ -101,7 +98,6 @@ exports.getAllQuestionsAndRounds = async function (req, res, next) {
         });
     }
     catch (err) {
-        if (err.statusCode === undefined) return next(new ApiError("Nešto nije u redu.", 500));
         return next(err);
     }
 }
@@ -110,7 +106,10 @@ exports.getAllQuestionsAndRounds = async function (req, res, next) {
 exports.deleteQuestionFromRound = async function (req, res, next) {
     try {
 
-        await Question.findByIdAndDelete(req.params.id);
+        const question = await Question.findByIdAndDelete(req.params.id);
+
+        if (!question) throw new ApiError("Pitanje ne postoji.", 404);
+
         res.status(204).json({
             status: 'success',
             data: null
@@ -118,7 +117,6 @@ exports.deleteQuestionFromRound = async function (req, res, next) {
 
     }
     catch (err) {
-        if (err.statusCode === undefined) return next(new ApiError("Nešto nije u redu.", 500));
         return next(err);
     }
 }
@@ -135,7 +133,7 @@ exports.createAnswer = async function (req, res, next) {
             answer: req.body.answer,
             is_correct: req.body.is_correct
         });
-        await question.save({ validateModifiedOnly: true });
+        await question.save();
 
         res.status(201).json({
             status: 'success',
@@ -143,7 +141,6 @@ exports.createAnswer = async function (req, res, next) {
         })
     }
     catch (err) {
-        if (err.statusCode === undefined) return next(new ApiError("Nešto nije u redu.", 500));
         return next(err);
     }
 }
@@ -152,13 +149,15 @@ exports.createAnswer = async function (req, res, next) {
 exports.getAnswersOfQuestion = async function (req, res, next) {
     try {
         const answers = await Question.findById(req.params.id).select("answers");
+
+        if (!answers) throw new ApiError("Pitanje ne postoji.", 404);
+
         res.status(200).json({
             status: 'success',
             answers
         })
     }
     catch (err) {
-        if (err.statusCode === undefined) return next(new ApiError("Nešto nije u redu.", 500));
         return next(err);
     }
 }
@@ -177,7 +176,7 @@ exports.editAnswers = async function (req, res, next) {
         matchAnswer.answer = req.body.answer;
         matchAnswer.is_correct = req.body.is_correct;
 
-        await question.save({ validateModifiedOnly: true });
+        await question.save();
 
         res.status(200).json({
             status: 'success',
@@ -186,7 +185,6 @@ exports.editAnswers = async function (req, res, next) {
 
     }
     catch (err) {
-        if (err.statusCode === undefined) return next(new ApiError("Nešto nije u redu.", 500));
         return next(err);
     }
 }
@@ -210,7 +208,6 @@ exports.deleteAnswer = async function (req, res, next) {
         })
     }
     catch (err) {
-        if (err.statusCode === undefined) return next(new ApiError("Nešto nije u redu.", 500));
         return next(err);
     }
 }

@@ -38,9 +38,8 @@ exports.register = async function (req, res, next) {
             token
         });
     }
-    catch (error) {
-        if (error.name === 'ValidationError') return next(new ApiError(error.message, 400));
-        return next(new ApiError('Nešto nije u redu.', 500));
+    catch (err) {
+        return next(err);
     }
 }
 
@@ -50,10 +49,10 @@ exports.logIn = async function (req, res, next) {
     try {
 
         const { email, password } = req.body;
-        if (!email || !password) return next(new ApiError("Morate unjeti e-mail i lozinku prilikom prijave.", 400));
+        if (!email || !password) throw new ApiError("Morate unjeti e-mail i lozinku prilikom prijave.", 400);
 
         const user = await User.findOne({ email: email }).select('+password');
-        if (!user || !await user.comparePw(password, user.password)) return next(new ApiError(`Neispravan e-mail: "${email}" ili lozinka.`, 401));
+        if (!user || !await user.comparePw(password, user.password)) throw new ApiError(`Neispravan e-mail: "${email}" ili lozinka.`, 401);
 
 
         const token = signToken(user.id);
@@ -65,8 +64,8 @@ exports.logIn = async function (req, res, next) {
         });
 
     }
-    catch (e) {
-        return next(new ApiError('Nešto nije u redu.', 500));
+    catch (err) {
+        return next(err);
     }
 }
 
@@ -78,7 +77,7 @@ exports.getMyProfile = async function (req, res, next) {
     try {
 
         const user = await User.findById(req.user.id);
-        if (!user) return next(new ApiError("Niste prijavljeni u aplikaciju.", 401));
+        if (!user) throw new ApiError("Niste prijavljeni u aplikaciju.", 401);
 
         res.status(200).json({
             status: 'success',
@@ -86,7 +85,7 @@ exports.getMyProfile = async function (req, res, next) {
         });
     }
     catch (err) {
-        return next(new ApiError("Nešto nije u redu.", 500));
+        return next(err);
     }
 }
 
@@ -101,7 +100,7 @@ exports.updateMe = async function (req, res, next) {
             new: true
         });
 
-        if (!user) return next(new ApiError("Korisnik nije pronađen", 404));
+        if (!user) throw new ApiError("Korisnik nije pronađen.", 404);
 
         const token = signToken(user._id);
         if (isProductionEnv()) cookieOptions.secure = true;
@@ -111,11 +110,8 @@ exports.updateMe = async function (req, res, next) {
             token
         });
     }
-    catch (e) {
-        if (e.name === 'ValidationError') return next(new ApiError(e.message, 400));
-        if (e.name === 'DuplicateKeyError') return next(new ApiError(e.message, 400));
-
-        return next(new ApiError("Nešto nije u redu.", 500));
+    catch (err) {
+        return next(err);
     }
 }
 
@@ -124,7 +120,7 @@ exports.deactivateMe = async function (req, res, next) {
     try {
 
         const user = await User.findById(req.user.id);
-        if (!user.isAccountActive) return next(new ApiError("Već Vam je deaktiviran račun.", 400));
+        if (!user.isAccountActive) throw new ApiError("Već Vam je deaktiviran račun.", 400);
 
         await User.findByIdAndUpdate(req.user.id, {
             isAccountActive: false
@@ -138,8 +134,8 @@ exports.deactivateMe = async function (req, res, next) {
             message: 'Račun uspješno deaktiviran. Svoj račun možete aktivirati ponovno kada poželite.'
         });
     }
-    catch (e) {
-        return next(new ApiError("Nešto nije u redu.", 500));
+    catch (err) {
+        return next(err);
     }
 }
 
@@ -149,7 +145,7 @@ exports.activateMe = async function (req, res, next) {
     try {
 
         const user = await User.findById(req.user.id);
-        if (user.isAccountActive) return next(new ApiError("Već Vam je aktiviran račun.", 400));
+        if (user.isAccountActive) throw new ApiError("Već Vam je aktiviran račun.", 400);
 
         await User.findByIdAndUpdate(req.user.id, {
             isAccountActive: true
@@ -162,8 +158,8 @@ exports.activateMe = async function (req, res, next) {
             message: 'Račun uspješno aktiviran. Možete koristiti ostale značajke aplikacije.'
         });
     }
-    catch (e) {
-        return next(new ApiError("Nešto nije u redu.", 500));
+    catch (err) {
+        return next(err);
     }
 }
 
@@ -171,11 +167,11 @@ exports.activateMe = async function (req, res, next) {
 exports.changePassword = async function (req, res, next) {
     try {
         const { password, passwordNew, passwordRepeat } = req.body;
-        if (!password || !passwordNew || !passwordRepeat) return next(new ApiError('Morate unjeti svoju trenutnu lozinku, novu lozinku, te ponoviti novu lozinku.', 400));
+        if (!password || !passwordNew || !passwordRepeat) throw new ApiError('Morate unjeti svoju trenutnu lozinku, novu lozinku, te ponoviti novu lozinku.', 400);
         const user = await User.findOne({ _id: req.user.id }).select("+password");
 
 
-        if (!await user.comparePw(password, user.password)) return next(new ApiError('Netočna trenutna lozinka.', 400));
+        if (!await user.comparePw(password, user.password)) throw new ApiError('Netočna trenutna lozinka.', 400);
         user.password = passwordNew;
         user.passwordConfirm = passwordRepeat;
 
@@ -192,8 +188,8 @@ exports.changePassword = async function (req, res, next) {
         })
 
     }
-    catch (e) {
-        return next(new ApiError("Nešto nije u redu.", 500));
+    catch (err) {
+        return next(err);
     }
 }
 

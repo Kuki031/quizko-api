@@ -19,8 +19,7 @@ exports.createCategory = async function (req, res, next) {
 
     }
     catch (err) {
-        if (err.name === 'ValidationError') return next(new ApiError(err.message, 400));
-        return next(new ApiError("Nešto nije u redu.", 500));
+        return next(err);
     }
 }
 
@@ -28,7 +27,7 @@ exports.createCategory = async function (req, res, next) {
 exports.getCategory = async function (req, res, next) {
     try {
         const category = await Category.findById(req.params.id);
-        if (!category) return next(new ApiError(`Kategorija sa ID-em ${req.params.id} ne postoji!`, 404));
+        if (!category) throw new ApiError(`Kategorija sa ID-em ${req.params.id} ne postoji!`, 404);
 
         res.status(200).json({
             status: 'success',
@@ -36,7 +35,7 @@ exports.getCategory = async function (req, res, next) {
         })
     }
     catch (err) {
-        return next(new ApiError("Nešto nije u redu.", 500));
+        return next(err);
     }
 }
 
@@ -50,8 +49,7 @@ exports.getAllCategories = async function (req, res, next) {
         })
     }
     catch (err) {
-        return next(new ApiError("Nešto nije u redu.", 500));
-
+        return next(err);
     }
 }
 
@@ -62,14 +60,14 @@ exports.updateCategory = async function (req, res, next) {
             new: true
         })
 
-        if (!category) return next(new ApiError(`Kategorija sa ID-em ${req.params.id} ne postoji.`, 404));
+        if (!category) throw new ApiError(`Kategorija sa ID-em ${req.params.id} ne postoji.`, 404);
         res.status(200).json({
             status: 'success',
             category
         })
     }
     catch (err) {
-        return next(new ApiError("Nešto nije u redu.", 500));
+        return next(err);
     }
 }
 
@@ -77,7 +75,7 @@ exports.deleteCategory = async function (req, res, next) {
     try {
         const category = await Category.findByIdAndDelete(req.params.id);
 
-        if (!category) return next(new ApiError(`Kategorija sa ID-em ${req.params.id} ne postoji.`, 404));
+        if (!category) throw new ApiError(`Kategorija sa ID-em ${req.params.id} ne postoji.`, 404);
 
         res.status(204).json({
             status: 'success',
@@ -85,6 +83,6 @@ exports.deleteCategory = async function (req, res, next) {
         });
     }
     catch (err) {
-        return next(new ApiError("Nešto nije u redu.", 500));
+        return next(err);
     }
 }
