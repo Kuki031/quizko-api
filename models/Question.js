@@ -12,15 +12,10 @@ const questionSchema = new mongoose.Schema({
         type: Number,
         default: 1
     },
-    time_to_answer: {
-        type: Number,
-        default: 60
-    },
     answers: [
         {
             answer: {
-                type: String,
-                required: [true, "Morate unjeti odgovor."]
+                type: String
             },
             is_correct: {
                 type: Boolean,

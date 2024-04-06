@@ -2,7 +2,6 @@
 
 const Question = require('../models/Question');
 const Quiz = require('../models/Quiz');
-const ApiFeatures = require('../utils/ApiFeatures');
 const ApiError = require('../utils/ApiError');
 
 
@@ -43,7 +42,7 @@ exports.createQuestionForRound = async function (req, res, next) {
     }
 }
 
-//Uredi pitanje (time_to_answer, name, num_of_points)
+//Uredi pitanje (name, num_of_points)
 exports.editQuestion = async function (req, res, next) {
     try {
 
@@ -99,7 +98,7 @@ exports.getAllQuestionsAndRounds = async function (req, res, next) {
 
         res.status(200).json({
             status: 'success',
-            data: populateQuery[parseInt(req.query.page)]
+            data: populateQuery
         });
     }
     catch (err) {
@@ -181,12 +180,8 @@ exports.editAnswers = async function (req, res, next) {
         const matchAnswer = question.answers.find(answer => answer.id === answerid);
         if (!matchAnswer) throw new ApiError("Odgovor ne postoji.", 404);
 
-        const checkDuplicate = question.answers.find(answer => answer.answer === req.body.answer);
-        if (checkDuplicate) throw new ApiError(`Odgovor "${req.body.answer}" već postoji.`, 400);
-
         matchAnswer.answer = req.body.answer;
         matchAnswer.is_correct = req.body.is_correct;
-
 
         await question.save();
         res.status(200).json({
