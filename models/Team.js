@@ -2,7 +2,6 @@
 
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
-const ApiError = require('../utils/ApiError');
 
 const teamSchema = new mongoose.Schema({
     name: {

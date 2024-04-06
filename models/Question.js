@@ -29,7 +29,5 @@ const questionSchema = new mongoose.Schema({
     timestamps: true
 })
 questionSchema.plugin(uniqueValidator);
-
-
 const Question = mongoose.model('Question', questionSchema);
 module.exports = Question;
