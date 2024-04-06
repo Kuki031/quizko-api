@@ -16,14 +16,18 @@ exports.createQuestionForRound = async function (req, res, next) {
         if (!quiz) throw new ApiError("Kviz ne postoji.", 404);
         if (!req.user.hasCreatedQuiz(req.user, quiz)) throw new ApiError("Niste kreirali ovaj kviz, s toga ne možete kreirati pitanje za ovaj kviz.", 403);
 
+        const targetRound = quiz.rounds.find(round => round.id === roundid);
+        if (!targetRound) throw new ApiError("Runda za kviz ne postoji.", 404);
+
         const newQuestion = await Question.create({
             name: req.body.name,
             num_of_points: req.body.num_of_points,
             time_to_answer: req.body.time_to_answer
         });
 
-        const targetRound = quiz.rounds.find(round => round.id === roundid);
-        if (!targetRound) throw new ApiError("Runda za kviz ne postoji.", 404);
+        await Quiz.populate(quiz.rounds, { path: 'questions', });
+        const checkDuplicate = targetRound.questions.find(question => question.name === req.body.name);
+        if (checkDuplicate) throw new ApiError(`Pitanje "${req.body.name}" već postoji.`, 400);
 
         targetRound.questions.push(newQuestion.id);
         await quiz.save();
@@ -42,6 +46,7 @@ exports.createQuestionForRound = async function (req, res, next) {
 //Uredi pitanje (time_to_answer, name, num_of_points)
 exports.editQuestion = async function (req, res, next) {
     try {
+
         const editQuestion = await Question.findByIdAndUpdate(req.params.id, {
             name: req.body.name,
             time_to_answer: req.body.time_to_answer,
@@ -52,7 +57,7 @@ exports.editQuestion = async function (req, res, next) {
 
         res.status(200).json({
             status: 'success',
-            editQuestion
+            question: editQuestion
         })
     }
     catch (err) {
@@ -90,11 +95,11 @@ exports.getAllQuestionsAndRounds = async function (req, res, next) {
         const quiz = await Quiz.findById(req.params.id);
         if (!quiz) throw new ApiError("Kviz ne postoji.", 404);
 
-        const populateQuery = await Quiz.populate(quiz.rounds, { path: 'questions', });
+        const populateQuery = await Quiz.populate(quiz.rounds, { path: 'questions' });
 
         res.status(200).json({
             status: 'success',
-            data: populateQuery
+            data: populateQuery[parseInt(req.query.page)]
         });
     }
     catch (err) {
@@ -128,6 +133,9 @@ exports.createAnswer = async function (req, res, next) {
         const question = await Question.findById(req.params.id);
 
         if (!question) throw new ApiError("Pitanje ne postoji.", 404);
+
+        const checkDuplicate = question.answers.find(answer => answer.answer === req.body.answer);
+        if (checkDuplicate) throw new ApiError(`Odgovor "${req.body.answer}" već postoji.`, 400);
 
         question.answers.push({
             answer: req.body.answer,
@@ -173,11 +181,14 @@ exports.editAnswers = async function (req, res, next) {
         const matchAnswer = question.answers.find(answer => answer.id === answerid);
         if (!matchAnswer) throw new ApiError("Odgovor ne postoji.", 404);
 
+        const checkDuplicate = question.answers.find(answer => answer.answer === req.body.answer);
+        if (checkDuplicate) throw new ApiError(`Odgovor "${req.body.answer}" već postoji.`, 400);
+
         matchAnswer.answer = req.body.answer;
         matchAnswer.is_correct = req.body.is_correct;
 
-        await question.save();
 
+        await question.save();
         res.status(200).json({
             status: 'success',
             question

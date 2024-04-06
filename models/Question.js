@@ -35,6 +35,6 @@ const questionSchema = new mongoose.Schema({
 })
 questionSchema.plugin(uniqueValidator);
 
-const Question = mongoose.model('Question', questionSchema);
 
+const Question = mongoose.model('Question', questionSchema);
 module.exports = Question;

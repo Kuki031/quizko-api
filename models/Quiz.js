@@ -81,4 +81,5 @@ quizSchema.methods.isInProgress = (quiz, currentDate) => quiz.starts_at <= curre
 
 
 const Quiz = mongoose.model('Quiz', quizSchema);
+
 module.exports = Quiz;

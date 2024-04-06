@@ -166,6 +166,9 @@ exports.createNewRoundForQuiz = async function (req, res, next) {
         if (!quiz) throw new ApiError("Kviz ne postoji.", 404);
         if (!req.user.hasCreatedQuiz(req.user, quiz)) throw new ApiError("Niste kreirali ovaj kviz.", 403);
 
+        const checkDuplicate = quiz.rounds.find(round => round.name === req.body.name);
+        if (checkDuplicate) throw new ApiError(`Runda "${req.body.name}" već postoji.`, 400);
+
         quiz.rounds.push({
             name: req.body.name
         });
@@ -195,7 +198,12 @@ exports.editRoundForQuiz = async function (req, res, next) {
 
         if (!req.user.hasCreatedQuiz(req.user, roundInQuiz)) throw new ApiError("Niste kreirali ovaj kviz, s toga ne možete uređivati rundu kviza.", 403);
 
+
+        const checkDuplicate = roundInQuiz.rounds.find(round => round.name === req.body.name);
+        if (checkDuplicate) throw new ApiError(`Runda "${req.body.name}" već postoji.`, 400);
+
         roundInQuiz.rounds[round].name = req.body.name;
+
         await roundInQuiz.save();
         res.status(200).json({
             status: 'success',
