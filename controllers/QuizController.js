@@ -4,7 +4,6 @@ const Category = require('../models/Category');
 const Quiz = require('../models/Quiz');
 const User = require('../models/User');
 const ApiError = require('../utils/ApiError');
-const ApiFeatures = require('../utils/ApiFeatures');
 
 exports.createQuiz = async function (req, res, next) {
     try {
