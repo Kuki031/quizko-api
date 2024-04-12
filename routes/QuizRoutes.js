@@ -5,6 +5,7 @@ const quizController = require('../controllers/QuizController');
 const userController = require('../controllers/UserController');
 const isLoggedIn = require('../middlewares/isLoggedIn');
 const restrictAccess = require('../middlewares/restrictAccess');
+const restrictQuizOps = require('../middlewares/restrictQuizOps');
 
 const quizRouter = express.Router();
 
@@ -28,10 +29,21 @@ quizRouter.route('/update-quiz/:id').patch(quizController.updateQuiz);
 quizRouter.route('/delete-quiz/:id').delete(quizController.deleteQuiz);
 quizRouter.route('/:id/new-round').post(quizController.createNewRoundForQuiz);
 
-//Nested routes (Refactor later with {mergerParams: true})
-quizRouter.route('/:quizid/edit-round/:roundid').patch(quizController.editRoundForQuiz);
-quizRouter.route('/:quizid/delete-round/:roundid').delete(quizController.deleteRoundForQuiz);
-quizRouter.route('/:quizid/round/:roundid').get(quizController.getSingleRound);
+//Rounds
+quizRouter.route('/edit-round/:roundid').patch(restrictQuizOps, quizController.editRoundForQuiz);
+quizRouter.route('/delete-round/:roundid').patch(restrictQuizOps, quizController.deleteRoundForQuiz);
+quizRouter.route('/round/:roundid').get(restrictQuizOps, quizController.getSingleRound);
 
+//Questions for rounds
+quizRouter.route('/new-question/:roundid').post(restrictQuizOps, quizController.newQuestion);
+quizRouter.route('/edit-question/:questionid').patch(restrictQuizOps, quizController.editQuestion);
+quizRouter.route('/delete-question/:questionid').patch(restrictQuizOps, quizController.deleteQuestion);
+quizRouter.route('/round-questions/:roundid').get(restrictQuizOps, quizController.queryAllQuestionsFromRound);
+quizRouter.route('/single-question/:questionid').get(restrictQuizOps, quizController.getSingleQuestion);
+
+//Answers for questions
+quizRouter.route('/new-answer/:questionid').post(restrictQuizOps, quizController.createNewAnswerForQuestion);
+quizRouter.route('/edit-answer/:answerid/question/:questionid').patch(restrictQuizOps, quizController.editAnswer);
+quizRouter.route('/delete-answer/:answerid/question/:questionid').patch(restrictQuizOps, quizController.deleteAnswer);
 module.exports = quizRouter;
 

@@ -62,8 +62,24 @@ const quizSchema = new mongoose.Schema({
             },
             questions: [
                 {
-                    type: mongoose.Schema.ObjectId,
-                    ref: 'Question'
+                    name: {
+                        type: String,
+                    },
+                    num_of_points: {
+                        type: Number,
+                        default: 1
+                    },
+                    answers: [
+                        {
+                            answer: {
+                                type: String
+                            },
+                            is_correct: {
+                                type: Boolean,
+                                default: false
+                            }
+                        }
+                    ]
                 }
             ],
         }

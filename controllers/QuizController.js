@@ -4,6 +4,7 @@ const Category = require('../models/Category');
 const Quiz = require('../models/Quiz');
 const User = require('../models/User');
 const ApiError = require('../utils/ApiError');
+const ApiFeatures = require('../utils/ApiFeatures');
 
 exports.createQuiz = async function (req, res, next) {
     try {
@@ -188,26 +189,18 @@ exports.createNewRoundForQuiz = async function (req, res, next) {
 //Uredi rundu (samo ime)
 exports.editRoundForQuiz = async function (req, res, next) {
     try {
-        const { roundid, quizid } = req.params;
-        const roundInQuiz = await Quiz.findById(quizid);
 
-        if (!roundInQuiz) throw new ApiError(`Kviz ne postoji.`, 404);
-        const round = roundInQuiz.rounds.findIndex(round => round.id === roundid);
+        const round = await Quiz.findOneAndUpdate(
+            { "rounds._id": req.params.roundid },
+            { $set: { "rounds.$.name": req.body.name } },
+            { runValidators: true, new: true }
+        );
 
-        if (round === -1) throw new ApiError(`Runda za kviz ne postoji.`, 404);
+        if (!round) throw new ApiError("Runda za kviz ne postoji.", 404);
 
-        if (!req.user.hasCreatedQuiz(req.user, roundInQuiz)) throw new ApiError("Niste kreirali ovaj kviz, s toga ne možete uređivati rundu kviza.", 403);
-
-
-        const checkDuplicate = roundInQuiz.rounds.find(round => round.name === req.body.name);
-        if (checkDuplicate) throw new ApiError(`Runda "${req.body.name}" već postoji.`, 400);
-
-        roundInQuiz.rounds[round].name = req.body.name;
-
-        await roundInQuiz.save();
         res.status(200).json({
             status: 'success',
-            round: roundInQuiz.rounds[round]
+            round
         })
     }
     catch (err) {
@@ -215,18 +208,15 @@ exports.editRoundForQuiz = async function (req, res, next) {
     }
 }
 
-//Izbrisi rundu (obrisat ce ref na question entity, ali ne i pitanja)
+//Izbrisi rundu
 exports.deleteRoundForQuiz = async function (req, res, next) {
     try {
-        const { roundid, quizid } = req.params;
-        const roundInQuiz = await Quiz.findById(quizid);
+        const round = await Quiz.findOneAndUpdate(
+            { "rounds._id": req.params.roundid },
+            { $pull: { rounds: { _id: req.params.roundid } } },
+        );
 
-        if (!roundInQuiz) throw new ApiError(`Kviz ne postoji.`, 404);
-        const round = roundInQuiz.rounds.findIndex(round => round.id === roundid);
-        if (round === -1) throw new ApiError(`Runda za kviz ne postoji.`, 404);
-        if (!req.user.hasCreatedQuiz(req.user, roundInQuiz)) throw new ApiError("Niste kreirali ovaj kviz, s toga ne možete uređivati rundu kviza.", 403);
-
-        await Quiz.findByIdAndUpdate(quizid, { $pull: { rounds: { _id: roundid } } })
+        if (!round) throw new ApiError("Runda za kviz ne postoji.", 404);
 
         res.status(204).json({
             status: 'success',
@@ -258,13 +248,10 @@ exports.getAllRoundsForQuiz = async function (req, res, next) {
 //Dohvati jednu rundu
 exports.getSingleRound = async function (req, res, next) {
     try {
-        const { roundid, quizid } = req.params;
-        const singleQuizRound = await Quiz.findById(quizid);
 
-        if (!singleQuizRound) throw new ApiError(`Kviz ne postoji.`, 404);
-        const round = singleQuizRound.rounds.find(round => round.id === roundid);
-        if (!round) throw new ApiError(`Runda za kviz ne postoji.`, 404);
-        if (!req.user.hasCreatedQuiz(req.user, singleQuizRound)) throw new ApiError("Niste kreirali ovaj kviz, s toga ne možete vidjeti rundu kviza.", 403);
+        const round = await Quiz.findOne({ "rounds._id": req.params.roundid }, { "rounds.$": 1 })
+
+        if (!round) throw new ApiError("Runda ne postoji.", 404);
 
         res.status(200).json({
             status: 'success',
@@ -272,6 +259,266 @@ exports.getSingleRound = async function (req, res, next) {
         })
     }
     catch (err) {
+        return next(err);
+    }
+}
+
+
+//Questions
+exports.newQuestion = async function (req, res, next) {
+    try {
+        const round = await Quiz.findOne({ "rounds._id": req.params.roundid }, { "rounds.$": 1 });
+        if (!round) throw new ApiError("Runda ne postoji.", 404);
+
+        const checkDuplicate = round.rounds[0].questions.find(question => question.name === req.body.name);
+        if (checkDuplicate) throw new ApiError(`Pitanje "${req.body.name}" već postoji.`, 400);
+
+        const newQuestion = await Quiz.findOneAndUpdate(
+            { "rounds._id": req.params.roundid },
+            { $push: { "rounds.$.questions": { "name": req.body.name, "num_of_points": req.body.num_of_points } } },
+            { runValidators: true, new: true }
+        );
+
+
+        res.status(201).json({
+            status: 'success',
+            newQuestion
+        })
+    }
+    catch (err) {
+        return next(err);
+    }
+}
+
+exports.editQuestion = async function (req, res, next) {
+    try {
+        const question = await Quiz.findOneAndUpdate(
+            { "rounds.questions._id": req.params.questionid },
+            {
+                $set: {
+                    "rounds.$[outer].questions.$[inner].name": req.body.name,
+                    "rounds.$[outer].questions.$[inner].num_of_points": req.body.num_of_points
+                }
+            },
+            {
+                arrayFilters: [
+                    { "outer.questions._id": req.params.questionid },
+                    { "inner._id": req.params.questionid }
+                ],
+                runValidators: true,
+                new: true
+            }
+        );
+
+        if (!question) throw new ApiError("Pitanje ne postoji.", 404);
+
+        res.status(200).json({
+            status: 'success',
+            question
+        })
+    }
+    catch (err) {
+        return next(err);
+    }
+}
+
+exports.deleteQuestion = async function (req, res, next) {
+    try {
+        const question = await Quiz.findOneAndUpdate(
+            { "rounds.questions._id": req.params.questionid },
+            {
+                $pull: {
+                    "rounds.$[outer].questions": { _id: req.params.questionid },
+                }
+            },
+            {
+                arrayFilters: [
+                    { "outer.questions._id": req.params.questionid },
+                ],
+                new: true
+            }
+        );
+
+        if (!question) throw new ApiError("Pitanje ne postoji.", 404);
+
+        res.status(204).json({
+            status: 'success',
+            question
+        })
+    }
+    catch (err) {
+        return next(err);
+    }
+}
+
+exports.queryAllQuestionsFromRound = async function (req, res, next) {
+    try {
+
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const round = await Quiz.findOne(
+            { "rounds._id": req.params.roundid },
+            { "rounds.$": 1 }
+        );
+
+        if (!round) throw new ApiError("Runda ne postoji.", 404);
+
+        const questions = round.rounds[0].questions;
+        const paginatedQuestions = questions.slice(skip, skip + limit);
+
+        res.status(200).json({
+            status: 'success',
+            currentPage: page,
+            totalQuestions: questions.length,
+            questions: paginatedQuestions
+        });
+    }
+    catch (err) {
+        return next(err);
+    }
+}
+
+exports.getSingleQuestion = async function (req, res, next) {
+    try {
+        const round = await Quiz.findOne({ "rounds.questions._id": req.params.questionid }, { "rounds.$": 1 });
+
+        if (!round) throw new ApiError("Runda ne postoji.", 404);
+        const questions = round.rounds[0].questions;
+        const question = questions.find(q => q._id.toString() === req.params.questionid);
+
+        if (!question) throw new ApiError("Pitanje ne postoji.", 404);
+
+        res.status(200).json({
+            status: 'success',
+            question
+        })
+
+    }
+    catch (err) {
+        return next(err);
+    }
+}
+
+//Answers
+exports.createNewAnswerForQuestion = async function (req, res, next) {
+    try {
+
+        const answerExists = await Quiz.exists({
+            "rounds.questions._id": req.params.questionid,
+            "rounds.questions.answers": {
+                $elemMatch: {
+                    answer: req.body.answer,
+                    is_correct: req.body.is_correct
+                }
+            }
+        });
+
+        if (answerExists) throw new ApiError("Odgovor već postoji.", 400);
+
+        const updatedQuiz = await Quiz.findOneAndUpdate(
+            { "rounds.questions._id": req.params.questionid },
+            {
+                $push: {
+                    "rounds.$.questions.$[inner].answers": {
+                        answer: req.body.answer,
+                        is_correct: req.body.is_correct
+                    }
+                }
+            },
+            {
+                arrayFilters: [{ "inner._id": req.params.questionid }],
+                new: true
+            }
+        );
+
+        if (!updatedQuiz) throw new ApiError("Pitanje ne postoji.", 404);
+
+        const round = updatedQuiz.rounds.find(round => round.questions.some(q => q._id.toString() === req.params.questionid));
+        if (!round) throw new ApiError("Runda ne postoji.", 404);
+
+        const question = round.questions.find(q => q._id.toString() === req.params.questionid);
+        if (!question) throw new ApiError("Pitanje ne postoji.", 404);
+
+        const newAnswer = question.answers.find(answer => answer.answer === req.body.answer && answer.is_correct === req.body.is_correct);
+
+        res.status(201).json({
+            status: 'success',
+            newAnswer
+        });
+    } catch (err) {
+        return next(err);
+    }
+
+}
+
+exports.editAnswer = async function (req, res, next) {
+    try {
+        const updatedQuiz = await Quiz.findOneAndUpdate(
+            { "rounds.questions._id": req.params.questionid, "rounds.questions.answers._id": req.params.answerid },
+            {
+                $set: {
+                    "rounds.$[outer].questions.$[inner].answers.$[answer].answer": req.body.answer,
+                    "rounds.$[outer].questions.$[inner].answers.$[answer].is_correct": req.body.is_correct
+                }
+            },
+            {
+                arrayFilters: [
+                    { "outer.questions._id": req.params.questionid },
+                    { "inner._id": req.params.questionid },
+                    { "answer._id": req.params.answerid }
+                ],
+                new: true
+            }
+        );
+
+        if (!updatedQuiz) throw new ApiError("Traženi odgovor na ovo pitanje ne postoji.", 404);
+
+        const round = updatedQuiz.rounds.find(round => round.questions.some(q => q._id.toString() === req.params.questionid));
+        if (!round) throw new ApiError("Runda ne postoji.", 404);
+
+        const question = round.questions.find(q => q._id.toString() === req.params.questionid);
+        if (!question) throw new ApiError("Pitanje ne postoji.", 404);
+
+        const updatedAnswer = question.answers.find(answer => answer._id.toString() === req.params.answerid);
+
+        res.status(200).json({
+            status: 'success',
+            answer: updatedAnswer
+        });
+    } catch (err) {
+        return next(err);
+    }
+}
+
+exports.deleteAnswer = async function (req, res, next) {
+    try {
+        const updatedQuiz = await Quiz.findOneAndUpdate(
+            { "rounds.questions._id": req.params.questionid },
+            { $pull: { "rounds.$[outer].questions.$[inner].answers": { _id: req.params.answerid } } },
+            {
+                arrayFilters: [
+                    { "outer.questions._id": req.params.questionid },
+                    { "inner._id": req.params.questionid }
+                ],
+                new: true
+            }
+        );
+
+        if (!updatedQuiz) throw new ApiError("Traženi odgovor na ovo pitanje ne postoji.", 404);
+
+        const round = updatedQuiz.rounds.find(round => round.questions.some(q => q._id.toString() === req.params.questionid));
+        if (!round) throw new ApiError("Runda ne postoji.", 404);
+
+        const question = round.questions.find(q => q._id.toString() === req.params.questionid);
+        if (!question) throw new ApiError("Pitanje ne postoji.", 404);
+
+        res.status(204).json({
+            status: 'success',
+            data: null
+        });
+    } catch (err) {
         return next(err);
     }
 }
