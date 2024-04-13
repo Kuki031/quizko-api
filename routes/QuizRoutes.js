@@ -30,20 +30,20 @@ quizRouter.route('/delete-quiz/:id').delete(quizController.deleteQuiz);
 quizRouter.route('/:id/new-round').post(quizController.createNewRoundForQuiz);
 
 //Rounds
-quizRouter.route('/edit-round/:roundid').patch(restrictQuizOps, quizController.editRoundForQuiz);
-quizRouter.route('/delete-round/:roundid').patch(restrictQuizOps, quizController.deleteRoundForQuiz);
-quizRouter.route('/round/:roundid').get(restrictQuizOps, quizController.getSingleRound);
+quizRouter.route('/edit-round/:roundid').patch(restrictQuizOps(["roundid"], ["rounds._id"]), quizController.editRoundForQuiz);
+quizRouter.route('/delete-round/:roundid').patch(restrictQuizOps(["roundid"], ["rounds._id"]), quizController.deleteRoundForQuiz);
+quizRouter.route('/round/:roundid').get(restrictQuizOps(["roundid"], ["rounds._id"]), quizController.getSingleRound);
 
 //Questions for rounds
-quizRouter.route('/new-question/:roundid').post(restrictQuizOps, quizController.newQuestion);
-quizRouter.route('/edit-question/:questionid').patch(restrictQuizOps, quizController.editQuestion);
-quizRouter.route('/delete-question/:questionid').patch(restrictQuizOps, quizController.deleteQuestion);
-quizRouter.route('/round-questions/:roundid').get(restrictQuizOps, quizController.queryAllQuestionsFromRound);
-quizRouter.route('/single-question/:questionid').get(restrictQuizOps, quizController.getSingleQuestion);
+quizRouter.route('/new-question/:roundid').post(restrictQuizOps(["roundid"], ["rounds._id"]), quizController.newQuestion);
+quizRouter.route('/edit-question/:questionid').patch(restrictQuizOps(["questionid"], ["rounds.questions._id"]), quizController.editQuestion);
+quizRouter.route('/delete-question/:questionid').patch(restrictQuizOps(["questionid"], ["rounds.questions._id"]), quizController.deleteQuestion);
+quizRouter.route('/round-questions/:roundid').get(restrictQuizOps(["roundid"], ["rounds._id"]), quizController.queryAllQuestionsFromRound);
+quizRouter.route('/single-question/:questionid').get(restrictQuizOps(["questionid"], ["rounds.questions._id"]), quizController.getSingleQuestion);
 
 //Answers for questions
-quizRouter.route('/new-answer/:questionid').post(restrictQuizOps, quizController.createNewAnswerForQuestion);
-quizRouter.route('/edit-answer/:answerid/question/:questionid').patch(restrictQuizOps, quizController.editAnswer);
-quizRouter.route('/delete-answer/:answerid/question/:questionid').patch(restrictQuizOps, quizController.deleteAnswer);
+quizRouter.route('/new-answer/:questionid').post(restrictQuizOps(["questionid"], ["rounds.questions._id"]), quizController.createNewAnswerForQuestion);
+quizRouter.route('/edit-answer/:answerid/question/:questionid').patch(restrictQuizOps(["answerid", "questionid"], ["rounds.questions._id", "rounds.questions.answers._id"]), quizController.editAnswer);
+quizRouter.route('/delete-answer/:answerid/question/:questionid').patch(restrictQuizOps(["answerid", "questionid"], ["rounds.questions._id", "rounds.questions.answers._id"]), quizController.deleteAnswer);
 module.exports = quizRouter;
 
