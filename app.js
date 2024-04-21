@@ -10,9 +10,9 @@ const compression = require('compression');
 const hpp = require('hpp');
 const ErrorController = require('./controllers/ErrorController');
 const UserRouter = require('./routes/UserRoutes');
-const CategoryRouter = require('./routes/CategoryRoutes');
+//const CategoryRouter = require('./routes/__CategoryRoutes');
 const QuizRouter = require('./routes/QuizRoutes');
-const TeamRouter = require('./routes/TeamRoutes');
+//const TeamRouter = require('./routes/TeamRoutes');
 const scoreboardRouter = require('./routes/ScoreboardRoutes');
 
 const app = express();
@@ -30,9 +30,6 @@ app.use(sanitizer.clean({
     sql: true
 }))
 app.use(compression());
-app.use(express.json({
-    limit: '10kb'
-}));
 app.use(cookieParser());
 app.use(express.urlencoded({
     extended: true,
@@ -44,9 +41,9 @@ app.use(express.urlencoded({
 
 
 app.use('/api/v1/users', UserRouter);
-app.use('/api/v1/categories', CategoryRouter);
+//app.use('/api/v1/categories', CategoryRouter);
 app.use('/api/v1/quizzes', QuizRouter);
-app.use('/api/v1/teams', TeamRouter);
+//app.use('/api/v1/teams', TeamRouter);
 app.use('/api/v1/scoreboards', scoreboardRouter);
 app.use(ErrorController);
 

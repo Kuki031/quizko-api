@@ -1,13 +1,13 @@
 'use strict'
 
-const Quiz = require('../models/Quiz');
-const Team = require('../models/Team');
-const User = require('../models/User');
-const ApiError = require('../utils/ApiError');
+// const Quiz = require('../models/Quiz');
+// const Team = require('../models/Team');
+// const User = require('../models/User');
+// const ApiError = require('../utils/ApiError');
 
 
 // Korisnik kreira tim (mora bit logiran, ne smije pripadat timu, ne smije pripadat kvizu)
-exports.createTeam = async function (req, res, next) {
+/*exports.createTeam = async function (req, res, next) {
     try {
         const team = await Team.create({
             name: req.body.name,
@@ -25,9 +25,9 @@ exports.createTeam = async function (req, res, next) {
     catch (err) {
         return next(err);
     }
-}
+}*/
 
-exports.getAllTeams = async function (req, res, next) {
+/*exports.getAllTeams = async function (req, res, next) {
     try {
         const teams = await Team.find().populate('team_leader', "username");
         res.status(200).json({
@@ -38,10 +38,10 @@ exports.getAllTeams = async function (req, res, next) {
     catch (err) {
         return next(err);
     }
-}
+}*/
 
 
-exports.getTeam = async function (req, res, next) {
+/*exports.getTeam = async function (req, res, next) {
     try {
         const team = await Team.findById(req.params.id).populate("team_leader", "username");
         if (!team) throw new ApiError("Tim ne postoji.", 404);
@@ -54,10 +54,10 @@ exports.getTeam = async function (req, res, next) {
     catch (err) {
         return next(err);
     }
-}
+}*/
 
 //Updateanje tima => samo tim lider, samo ime i kapacitet, ako je kviz u tijeku nema updateanja
-exports.updateTeam = async function (req, res, next) {
+/*exports.updateTeam = async function (req, res, next) {
     try {
 
         const team = await Team.findById(req.params.id);
@@ -76,10 +76,10 @@ exports.updateTeam = async function (req, res, next) {
     catch (err) {
         return next(err);
     }
-}
+}*/
 
 //Samo tim lider, nema brisanja tima dok je kviz u tijeku (ako obrise tim, state is_in_team svih usera postaje false i makne im se team)
-exports.deleteTeam = async function (req, res, next) {
+/*exports.deleteTeam = async function (req, res, next) {
     try {
         const team = await Team.findById(req.params.id);
 
@@ -107,10 +107,10 @@ exports.deleteTeam = async function (req, res, next) {
     catch (err) {
         return next(err);
     }
-}
+}*/
 
 //Samo tim lider moze inviteat druge u tim (preko username-a)
-exports.inviteToTeam = async function (req, res, next) {
+/*exports.inviteToTeam = async function (req, res, next) {
     try {
 
         //1) Dohvati svoj tim po imenu
@@ -148,9 +148,9 @@ exports.inviteToTeam = async function (req, res, next) {
     catch (err) {
         return next(err);
     }
-}
+}*/
 
-exports.acceptTeamInvitation = async function (req, res, next) {
+/*exports.acceptTeamInvitation = async function (req, res, next) {
     try {
 
         const team = await Team.findById(req.params.id);
@@ -183,7 +183,9 @@ exports.acceptTeamInvitation = async function (req, res, next) {
         return next(err);
     }
 }
+*/
 
+/*
 exports.leaveTeam = async function (req, res, next) {
     try {
         const user = await User.findById(req.user.id);
@@ -210,10 +212,10 @@ exports.leaveTeam = async function (req, res, next) {
         return next(err);
     }
 }
+*/
 
 
-
-exports.getMyTeam = async function (req, res, next) {
+/*exports.getMyTeam = async function (req, res, next) {
     try {
 
         const user = await User.findById(req.user.id).select("team");
@@ -230,8 +232,8 @@ exports.getMyTeam = async function (req, res, next) {
     catch (err) {
         return next(err);
     }
-}
-
+}*/
+/*
 exports.joinQuiz = async function (req, res, next) {
     try {
 
@@ -267,8 +269,8 @@ exports.joinQuiz = async function (req, res, next) {
         return next(err);
     }
 }
-
-exports.leaveQuiz = async function (req, res, next) {
+*/
+/*exports.leaveQuiz = async function (req, res, next) {
     try {
         const quiz = await Quiz.findById(req.params.id);
         if (!quiz) throw new ApiError("Kviz ne postoji.", 404);
@@ -300,4 +302,4 @@ exports.leaveQuiz = async function (req, res, next) {
     catch (err) {
         return next(err);
     }
-}
+}*/

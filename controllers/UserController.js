@@ -1,12 +1,12 @@
 'use strict';
 
-const Quiz = require('../models/Quiz');
-const User = require('../models/User');
-const ApiError = require('../utils/ApiError');
+// const Quiz = require('../models/Quiz');
+// const User = require('../models/User');
+// const ApiError = require('../utils/ApiError');
 
 
 
-exports.saveQuiz = async function (req, res, next) {
+/*exports.saveQuiz = async function (req, res, next) {
     try {
         const quizId = req.params.quizid;
 
@@ -34,9 +34,9 @@ exports.saveQuiz = async function (req, res, next) {
     catch (err) {
         return next(err);
     }
-}
+}*/
 
-exports.getSavedQuizzes = async function (req, res, next) {
+/*exports.getSavedQuizzes = async function (req, res, next) {
     try {
         const savedQuizzes = await User.findById(req.user.id, { saved_quizzes: true }).populate('saved_quizzes');
         res.status(200).json({
@@ -47,10 +47,10 @@ exports.getSavedQuizzes = async function (req, res, next) {
     catch (err) {
         return next(err);
     }
-}
+}*/
 
 
-exports.deleteSavedQuiz = async function (req, res, next) {
+/*exports.deleteSavedQuiz = async function (req, res, next) {
     try {
         const quizId = req.params.quizid;
 
@@ -76,4 +76,4 @@ exports.deleteSavedQuiz = async function (req, res, next) {
     catch (err) {
         return next(err);
     }
-}
+}*/

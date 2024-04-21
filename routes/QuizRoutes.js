@@ -14,9 +14,9 @@ const quizRouter = express.Router();
 quizRouter.use(isLoggedIn);
 quizRouter.route('/all').get(quizController.getAllQuizzes);
 quizRouter.route('/quizzes-by-category').get(quizController.getQuizzesByCategories);
-quizRouter.route('/save-quiz/:quizid').patch(userController.saveQuiz);
-quizRouter.route('/saved-quizzes').get(userController.getSavedQuizzes);
-quizRouter.route('/my-quizzes/delete-quiz/:quizid').delete(userController.deleteSavedQuiz);
+// quizRouter.route('/save-quiz/:quizid').patch(userController.saveQuiz);
+// quizRouter.route('/saved-quizzes').get(userController.getSavedQuizzes);
+// quizRouter.route('/my-quizzes/delete-quiz/:quizid').delete(userController.deleteSavedQuiz);
 quizRouter.route('/quiz/:id').get(quizController.getQuiz);
 
 

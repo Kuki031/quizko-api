@@ -7,14 +7,10 @@ const ApiError = require('../utils/ApiError');
 
 exports.createQuiz = async function (req, res, next) {
     try {
-
-        const setCategory = await Category.findOne({ name: req.body.category });
-        if (!setCategory) throw new ApiError(`Kategorija ne postoji.`, 404);
-
         const quiz = await Quiz.create({
             name: req.body.name,
             description: req.body.description,
-            category: setCategory.id,
+            category: req.body.category,
             is_locked: req.body.is_locked,
             starts_at: req.body.starts_at,
             ends_at: req.body.ends_at,
@@ -109,10 +105,17 @@ exports.deleteQuiz = async function (req, res, next) {
 
 exports.getUserQuizzes = async function (req, res, next) {
     try {
+
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
         const quizzes = await Quiz.find({ created_by: req.user.id });
+        const quizzesP = quizzes;
+        const paginatedQuizzes = quizzesP.slice(skip, skip + limit);
         res.status(200).json({
             status: 'success',
-            quizzes
+            paginatedQuizzes
         })
     }
     catch (err) {

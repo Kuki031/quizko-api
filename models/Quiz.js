@@ -16,9 +16,8 @@ const quizSchema = new mongoose.Schema({
         default: 'Nema opisa.'
     },
     category: {
-        type: mongoose.Schema.ObjectId,
-        ref: 'Category',
-        required: [true, "Morate kviz svrstati u kategoriju."]
+        type: String,
+        required: [true, "Morate napisati kategoriju za kviz."]
     },
     is_locked: {
         type: Boolean,
@@ -40,25 +39,39 @@ const quizSchema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: 'User'
     },
+    num_of_rounds: {
+        type: Number,
+        required: [true, "Morate unjeti broj rundi"]
+    },
     scoreboard: {
         name: {
-            type: String,
-            unique: true
+            type: String
         },
         num_of_teams: {
             type: Number,
             default: 0
         },
-        teams: [{
-            type: mongoose.Schema.ObjectId,
-            ref: 'Team'
-        }]
+        teams: [
+            {
+                name: {
+                    type: String
+                },
+                points_earned: {
+                    type: Number,
+                    default: 0
+                }
+            }
+        ]
     },
     rounds: [
         {
             name: {
                 type: String,
                 maxLength: 60
+            },
+            num_of_questions: {
+                type: Number,
+                required: [true, "Morate unjeti broj pitanja za rundu."]
             },
             questions: [
                 {

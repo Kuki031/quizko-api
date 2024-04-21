@@ -94,7 +94,8 @@ exports.getMyProfile = async function (req, res, next) {
 exports.updateMe = async function (req, res, next) {
     try {
         const user = await User.findByIdAndUpdate(req.user.id, {
-            username: req.body.username
+            username: req.body.username,
+            email: req.body.email
         }, {
             runValidators: true,
             new: true
@@ -115,53 +116,6 @@ exports.updateMe = async function (req, res, next) {
     }
 }
 
-//Deaktivacija računa
-exports.deactivateMe = async function (req, res, next) {
-    try {
-
-        const user = await User.findById(req.user.id);
-        if (!user.isAccountActive) throw new ApiError("Već Vam je deaktiviran račun.", 400);
-
-        await User.findByIdAndUpdate(req.user.id, {
-            isAccountActive: false
-        }, {
-            runValidators: true,
-            new: true
-        });
-
-        res.status(200).json({
-            status: 'success',
-            message: 'Račun uspješno deaktiviran. Svoj račun možete aktivirati ponovno kada poželite.'
-        });
-    }
-    catch (err) {
-        return next(err);
-    }
-}
-
-
-//Reaktivacija računa
-exports.activateMe = async function (req, res, next) {
-    try {
-
-        const user = await User.findById(req.user.id);
-        if (user.isAccountActive) throw new ApiError("Već Vam je aktiviran račun.", 400);
-
-        await User.findByIdAndUpdate(req.user.id, {
-            isAccountActive: true
-        }, {
-            runValidators: true,
-            new: true
-        });
-        res.status(200).json({
-            status: 'success',
-            message: 'Račun uspješno aktiviran. Možete koristiti ostale značajke aplikacije.'
-        });
-    }
-    catch (err) {
-        return next(err);
-    }
-}
 
 //Promjena lozinke
 exports.changePassword = async function (req, res, next) {
@@ -192,6 +146,21 @@ exports.changePassword = async function (req, res, next) {
         return next(err);
     }
 }
+
+//Brisanje cijelog profila (iz baze)
+exports.deleteMyAccount = async function (req, res, next) {
+    try {
+        await User.findByIdAndDelete(req.user.id);
+        res.status(204).json({
+            status: 'success',
+            data: null
+        })
+    }
+    catch (err) {
+        return next(err);
+    }
+}
+
 
 
 //Odjava

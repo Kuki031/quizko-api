@@ -1,6 +1,6 @@
 'use strict'
 
-const express = require('express');
+/*const express = require('express');
 const TeamController = require('../controllers/TeamController');
 const isLoggedIn = require('../middlewares/isLoggedIn');
 const checkUserTeamQuizState = require('../middlewares/checkUserTeamQuizState');
@@ -21,4 +21,4 @@ teamRouter.route('/join-quiz/:id').patch(TeamController.joinQuiz);
 teamRouter.route('/leave-quiz/:id').patch(TeamController.leaveQuiz);
 teamRouter.route('/:id').get(TeamController.getTeam);
 
-module.exports = teamRouter;
+module.exports = teamRouter;*/
