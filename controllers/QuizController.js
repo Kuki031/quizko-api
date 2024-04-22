@@ -1,6 +1,5 @@
 'use strict'
 
-const Category = require('../models/Category');
 const Quiz = require('../models/Quiz');
 const User = require('../models/User');
 const ApiError = require('../utils/ApiError');
@@ -13,6 +12,7 @@ exports.createQuiz = async function (req, res, next) {
             category: req.body.category,
             is_locked: req.body.is_locked,
             starts_at: req.body.starts_at,
+            num_of_rounds: req.body.num_of_rounds,
             ends_at: req.body.ends_at,
             date_to_signup: req.body.date_to_signup,
             created_by: req.user.id,
@@ -171,10 +171,13 @@ exports.createNewRoundForQuiz = async function (req, res, next) {
 
         const checkDuplicate = quiz.rounds.find(round => round.name === req.body.name);
         if (checkDuplicate) throw new ApiError(`Runda "${req.body.name}" već postoji.`, 400);
+        if (quiz.rounds.length === quiz.num_of_rounds) throw new ApiError("Dosegnut kapacitet broja rundi u kvizu.", 400);
 
-        quiz.rounds.push({
-            name: req.body.name
+        else quiz.rounds.push({
+            name: req.body.name,
+            num_of_questions: req.body.num_of_questions
         });
+
         await quiz.save();
 
         res.status(201).json({
@@ -194,7 +197,7 @@ exports.editRoundForQuiz = async function (req, res, next) {
 
         const round = await Quiz.findOneAndUpdate(
             { "rounds._id": req.params.roundid },
-            { $set: { "rounds.$.name": req.body.name } },
+            { $set: { "rounds.$.name": req.body.name, "rounds.$.num_of_questions": req.body.num_of_questions } },
             { runValidators: true, new: true }
         );
 
@@ -275,9 +278,12 @@ exports.newQuestion = async function (req, res, next) {
         const checkDuplicate = round.rounds[0].questions.find(question => question.name === req.body.name);
         if (checkDuplicate) throw new ApiError(`Pitanje "${req.body.name}" već postoji.`, 400);
 
+        if (round.rounds[0].num_of_questions === round.rounds[0].questions.length) throw new ApiError("Dosegnut kapacitet broja pitanja u rundi.", 400);
+
+
         const newQuestion = await Quiz.findOneAndUpdate(
             { "rounds._id": req.params.roundid },
-            { $push: { "rounds.$.questions": { "name": req.body.name, "num_of_points": req.body.num_of_points } } },
+            { $push: { "rounds.$.questions": { "name": req.body.name, "num_of_points": req.body.num_of_points, "num_of_answers": req.body.num_of_answers } } },
             { runValidators: true, new: true }
         );
 
@@ -299,7 +305,8 @@ exports.editQuestion = async function (req, res, next) {
             {
                 $set: {
                     "rounds.$[outer].questions.$[inner].name": req.body.name,
-                    "rounds.$[outer].questions.$[inner].num_of_points": req.body.num_of_points
+                    "rounds.$[outer].questions.$[inner].num_of_points": req.body.num_of_points,
+                    "rounds.$[outer].questions.$[inner].num_of_answers": req.body.num_of_answers
                 }
             },
             {
@@ -406,7 +413,6 @@ exports.getSingleQuestion = async function (req, res, next) {
 //Answers
 exports.createNewAnswerForQuestion = async function (req, res, next) {
     try {
-
         const answerExists = await Quiz.exists({
             "rounds.questions._id": req.params.questionid,
             "rounds.questions.answers": {
@@ -418,6 +424,22 @@ exports.createNewAnswerForQuestion = async function (req, res, next) {
         });
 
         if (answerExists) throw new ApiError("Odgovor već postoji.", 400);
+
+
+        const quiz = await Quiz.findOne({ "rounds.questions._id": req.params.questionid });
+        if (!quiz) throw new ApiError("Pitanje ne postoji.", 404);
+
+
+        const round = quiz.rounds.find(round => round.questions.some(q => q._id.toString() === req.params.questionid));
+        if (!round) throw new ApiError("Runda ne postoji.", 404);
+
+
+        const question = round.questions.find(q => q._id.toString() === req.params.questionid);
+        if (!question) throw new ApiError("Pitanje ne postoji.", 404);
+
+
+        if (question.answers.length >= question.num_of_answers) throw new ApiError("Dosegnuli ste kapacitet broja odgovora u pitanju.", 400);
+
 
         const updatedQuiz = await Quiz.findOneAndUpdate(
             { "rounds.questions._id": req.params.questionid },
@@ -435,25 +457,17 @@ exports.createNewAnswerForQuestion = async function (req, res, next) {
             }
         );
 
-        if (!updatedQuiz) throw new ApiError("Pitanje ne postoji.", 404);
-
-        const round = updatedQuiz.rounds.find(round => round.questions.some(q => q._id.toString() === req.params.questionid));
-        if (!round) throw new ApiError("Runda ne postoji.", 404);
-
-        const question = round.questions.find(q => q._id.toString() === req.params.questionid);
-        if (!question) throw new ApiError("Pitanje ne postoji.", 404);
-
         const newAnswer = question.answers.find(answer => answer.answer === req.body.answer && answer.is_correct === req.body.is_correct);
 
         res.status(201).json({
             status: 'success',
-            newAnswer
+            message: "Odgovor kreiran."
         });
     } catch (err) {
         return next(err);
     }
+};
 
-}
 
 exports.editAnswer = async function (req, res, next) {
     try {

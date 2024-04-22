@@ -19,10 +19,6 @@ const quizSchema = new mongoose.Schema({
         type: String,
         required: [true, "Morate napisati kategoriju za kviz."]
     },
-    is_locked: {
-        type: Boolean,
-        default: false
-    },
     starts_at: {
         type: Date,
         required: [true, "Morate unjeti vrijeme početka kviza."]
@@ -82,6 +78,11 @@ const quizSchema = new mongoose.Schema({
                         type: Number,
                         default: 1
                     },
+                    num_of_answers: {
+                        type: Number,
+                        enum: [2, 4, 0],
+                        required: [true, "Morate unjeti nešto od sljedećeg: 2,4 ili 0 ponuđenih odgovora"]
+                    },
                     answers: [
                         {
                             answer: {
@@ -108,6 +109,7 @@ quizSchema.index({ name: 1 }, { unique: true })
 
 quizSchema.methods.hasReachedDeadline = (quiz) => Date.now() > quiz.date_to_signup.getTime();
 quizSchema.methods.isInProgress = (quiz, currentDate) => quiz.starts_at <= currentDate && currentDate < quiz.ends_at;
+
 
 
 const Quiz = mongoose.model('Quiz', quizSchema);
