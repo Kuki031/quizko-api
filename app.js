@@ -14,6 +14,7 @@ const UserRouter = require('./routes/UserRoutes');
 const QuizRouter = require('./routes/QuizRoutes');
 //const TeamRouter = require('./routes/TeamRoutes');
 const scoreboardRouter = require('./routes/ScoreboardRoutes');
+const quizRouter = require('./routes/QuizRoutes');
 
 const app = express();
 
@@ -28,7 +29,7 @@ app.use(sanitizer.clean({
     xss: true,
     noSql: true,
     sql: true
-}))
+}, ["/api/v1/quizzes"]))
 app.use(compression());
 app.use(cookieParser());
 app.use(express.urlencoded({
