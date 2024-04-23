@@ -15,6 +15,7 @@ const QuizRouter = require('./routes/QuizRoutes');
 //const TeamRouter = require('./routes/TeamRoutes');
 const scoreboardRouter = require('./routes/ScoreboardRoutes');
 const quizRouter = require('./routes/QuizRoutes');
+const inf = require('./middlewares/inf');
 
 const app = express();
 
@@ -40,7 +41,7 @@ app.use(express.urlencoded({
 
 
 
-
+app.use(inf);
 app.use('/api/v1/users', UserRouter);
 //app.use('/api/v1/categories', CategoryRouter);
 app.use('/api/v1/quizzes', QuizRouter);
