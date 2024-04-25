@@ -15,10 +15,6 @@ const quizSchema = new mongoose.Schema({
         type: String,
         default: 'Nema opisa.'
     },
-    category: {
-        type: String,
-        required: [true, "Morate napisati kategoriju za kviz."]
-    },
     starts_at: {
         type: Date,
         required: [true, "Morate unjeti vrijeme početka kviza."]

@@ -9,7 +9,6 @@ const quizRouter = express.Router();
 
 quizRouter.use(isLoggedIn);
 quizRouter.route('/all').get(quizController.getAllQuizzes);
-quizRouter.route('/quizzes-by-category').get(quizController.getQuizzesByCategories);
 quizRouter.route('/quiz/:id').get(quizController.getQuiz);
 
 

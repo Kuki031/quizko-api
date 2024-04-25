@@ -3,6 +3,7 @@
 const Quiz = require('../models/Quiz');
 const User = require('../models/User');
 const ApiError = require('../utils/ApiError');
+const Pagination = require('../utils/Pagination');
 
 exports.createQuiz = async function (req, res, next) {
     try {
@@ -106,9 +107,7 @@ exports.deleteQuiz = async function (req, res, next) {
 exports.getUserQuizzes = async function (req, res, next) {
     try {
 
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 10;
-        const skip = (page - 1) * limit;
+        const { page, limit, skip } = Pagination(req.query.page, req.query.limit);
 
         const quizzes = await Quiz.find({ created_by: req.user.id });
         const quizzesP = quizzes;
@@ -122,42 +121,3 @@ exports.getUserQuizzes = async function (req, res, next) {
         return next(err);
     }
 }
-
-//Ovo popravit jer nema vise kategorije kao zasebnog entiteta
-exports.getQuizzesByCategories = async function (req, res, next) {
-    try {
-        const quizzesByCategory = await Quiz.aggregate([
-            {
-                $lookup: {
-                    from: "categories",
-                    localField: "category",
-                    foreignField: "_id",
-                    as: "categoryDetails"
-                }
-            },
-            {
-                $unwind: "$categoryDetails"
-            },
-            {
-                $group: {
-                    _id: { category: "$categoryDetails.name" },
-                    numOfQuizzes: { $count: {} },
-                    quizzes: { $push: { quiz: "$name" } }
-                }
-            },
-            {
-                $sort: { numOfQuizzes: -1 }
-            }
-        ]);
-
-        res.status(200).json({
-            status: 'success',
-            data: {
-                quizzesByCategory
-            }
-        });
-    }
-    catch (err) {
-        return next(err);
-    }
-};

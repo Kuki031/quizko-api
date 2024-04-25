@@ -3,7 +3,7 @@
 
 const Quiz = require('../models/Quiz');
 const ApiError = require('../utils/ApiError');
-
+const Pagination = require('../utils/Pagination');
 
 exports.newQuestion = async function (req, res, next) {
     try {
@@ -98,9 +98,7 @@ exports.deleteQuestion = async function (req, res, next) {
 exports.queryAllQuestionsFromRound = async function (req, res, next) {
     try {
 
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 10;
-        const skip = (page - 1) * limit;
+        const { page, limit, skip } = Pagination(req.query.page, req.query.limit);
 
         const round = await Quiz.findOne(
             { "rounds._id": req.params.roundid },
