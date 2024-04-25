@@ -12,6 +12,9 @@ const ErrorController = require('./controllers/ErrorController');
 const UserRouter = require('./routes/UserRoutes');
 const QuizRouter = require('./routes/QuizRoutes');
 const scoreboardRouter = require('./routes/ScoreboardRoutes');
+const RoundRouter = require('./routes/RoundRoutes');
+const QuestionRouter = require('./routes/QuestionRoutes');
+const AnswerRouter = require('./routes/AnswerRoutes');
 
 const app = express();
 
@@ -38,7 +41,7 @@ app.use(express.urlencoded({
 
 
 app.use('/api/v1/users', UserRouter);
-app.use('/api/v1/quizzes', QuizRouter);
+app.use('/api/v1/quizzes', QuizRouter, RoundRouter, QuestionRouter, AnswerRouter);
 app.use('/api/v1/scoreboards', scoreboardRouter);
 app.use(ErrorController);
 
