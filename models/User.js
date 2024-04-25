@@ -41,30 +41,11 @@ const userSchema = new mongoose.Schema({
         },
         select: false
     },
-    // is_in_team: {
-    //     type: Boolean,
-    //     default: false
-    // },
-    // team: {
-    //     type: mongoose.Schema.ObjectId,
-    //     ref: 'Team',
-    //     default: null
-    // },
-    // is_currently_in_quiz: {
-    //     type: Boolean,
-    //     default: false
-    // },
     role: {
         type: String,
         enum: ['Administrator', 'Moderator', 'Guest'],
         default: 'Guest'
     },
-    // team_invitations: [
-    //     {
-    //         type: mongoose.Schema.ObjectId,
-    //         ref: 'Team'
-    //     }
-    // ]
 }, {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
@@ -85,9 +66,6 @@ userSchema.pre('save', async function (next) {
 userSchema.methods.comparePw = async function (providedPw, storedPw) {
     return await bcrypt.compare(providedPw, storedPw);
 }
-
-// userSchema.methods.belongsToTeam = (user) => user.is_in_team;
-// userSchema.methods.isInActiveQuiz = (user) => user.is_currently_in_quiz;
 userSchema.methods.hasCreatedQuiz = (user, quiz) => user.id === quiz.created_by.toString();
 
 

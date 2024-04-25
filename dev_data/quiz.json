@@ -1,0 +1,1002 @@
+{
+    "name": "Božićni kviz",
+    "description": "Ovo je Božićni kviz.",
+    "category": "Opće znanje",
+    "starts_at": "2024-05-06 18:00:00",
+    "ends_at": "2024-05-06 21:00:00",
+    "date_to_signup": "2024-05-04 16:00:00",
+    "created_by": "6626b0b6d71d4661645cd529",
+    "num_of_rounds": 4,
+    "scoreboard": {
+        "name": "Božićni kviz-scoreboard",
+        "num_of_teams": 10,
+        "teams": [
+            {
+                "name": "JS tim",
+                "points_earned": 1
+            },
+            {
+                "name": "PHP tim",
+                "points_earned": 2
+            },
+            {
+                "name": "Java tim",
+                "points_earned": 3
+            },
+            {
+                "name": "Go tim",
+                "points_earned": 4
+            },
+            {
+                "name": "C++ tim",
+                "points_earned": 5
+            },
+            {
+                "name": "C tim",
+                "points_earned": 6
+            },
+            {
+                "name": "Python tim",
+                "points_earned": 7
+            },
+            {
+                "name": "CSS tim",
+                "points_earned": 8
+            },
+            {
+                "name": "C# tim",
+                "points_earned": 9
+            },
+            {
+                "name": "Kotlin tim",
+                "points_earned": 10
+            }
+        ]
+    },
+    "rounds": [
+        {
+            "name": "Povijesna runda",
+            "num_of_questions": 10,
+            "questions": [
+                {
+                    "name": "What was the immediate cause of World War I?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Assassination of Archduke Franz Ferdinand",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "Treaty of Versailles",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Invasion of Poland",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Bombing of Pearl Harbor",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "Who was the first female Prime Minister of the United Kingdom?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Queen Victoria",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Angela Merkel",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Margaret Thatcher",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "Indira Gandhi",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "Which ancient civilization built the Great Pyramids of Giza?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Ancient Greece",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Ancient Egypt",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "Mesopotamia",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Inca Empire",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "What was the significance of the Magna Carta?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Established the principle of habeas corpus",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Limited the power of the English monarchy",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "Ended the Hundred Years' War",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Created the Roman Republic",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "Who was the leader of the Soviet Union during the Cuban Missile Crisis?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Vladimir Lenin",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Joseph Stalin",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Mikhail Gorbachev",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Nikita Khrushchev",
+                            "is_correct": true
+                        }
+                    ]
+                },
+                {
+                    "name": "Which explorer is credited with discovering the sea route to India?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Vasco da Gama",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "Christopher Columbus",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Ferdinand Magellan",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Marco Polo",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "What event marked the beginning of the French Revolution?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Storming of the Bastille",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "Execution of Louis XVI",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Reign of Terror",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Declaration of the Rights of Man and of the Citizen",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "Who was the first president of the United States?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Thomas Jefferson",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "George Washington",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "Abraham Lincoln",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "John Adams",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "Which ancient civilization developed the concept of democracy?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Ancient China",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Ancient Rome",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Ancient Greece",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "Ancient Egypt",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "What was the main reason behind the construction of the Berlin Wall?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "To prevent East Germans from fleeing to the West",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "To keep Western spies out of East Berlin",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "To facilitate trade between East and West Germany",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "To commemorate the end of World War II",
+                            "is_correct": false
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Geografska runda",
+            "num_of_questions": 10,
+            "questions": [
+                {
+                    "name": "Which is the longest river in the world?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Amazon River",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Nile River",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "Yangtze River",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Mississippi River",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "What is the capital city of Australia?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Sydney",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Canberra",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "Melbourne",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Perth",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "Which desert is the largest in the world?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Sahara Desert",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "Gobi Desert",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Arabian Desert",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Kalahari Desert",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "Which country is known as the 'Land of the Rising Sun'?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "China",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "India",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Japan",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "South Korea",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "What is the highest mountain peak in the world?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Mount Kilimanjaro",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Mount Everest",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "K2",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Mount Fuji",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "Which ocean is the largest by area?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Atlantic Ocean",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Indian Ocean",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Pacific Ocean",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "Arctic Ocean",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "What is the smallest country in the world by land area?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Monaco",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Vatican City",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "Maldives",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Liechtenstein",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "Which continent is the driest inhabited continent?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Asia",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Africa",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Australia",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "South America",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "What is the largest lake in Africa?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Lake Tanganyika",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Lake Victoria",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "Lake Malawi",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Lake Turkana",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "Which city is located at the mouth of the Amazon River?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Buenos Aires",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Rio de Janeiro",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Manaus",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "Lima",
+                            "is_correct": false
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "IT runda",
+            "num_of_questions": 10,
+            "questions": [
+                {
+                    "name": "What does HTML stand for?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Hyper Text Markup Language",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "Hyperlinks and Text Markup Language",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Highly Technical Markup Language",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Home Tool Markup Language",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "Which programming language is commonly used for developing Android apps?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Java",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "Python",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "C++",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Swift",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "What does CPU stand for?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Central Processing Unit",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "Computer Processing Unit",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Central Program Unit",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Computer Power Unit",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "Which of the following is a version control system?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Apache",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Git",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "MySQL",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Linux",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "What is the primary function of a router in a computer network?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "To store data",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "To connect multiple computers",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "To forward data packets between computer networks",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "To display web pages",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "Which of the following is NOT a type of malware?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Virus",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Trojan",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Firewall",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "Worm",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "Which protocol is used for secure communication over a computer network?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "HTTP",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "FTP",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "SSH",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "SMTP",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "What is the file format of executable files in Windows?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": ".exe",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": ".docx",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": ".pdf",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": ".zip",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "Which programming language is often used for web development and is known for its simplicity?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Java",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Python",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "HTML",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "JavaScript",
+                            "is_correct": true
+                        }
+                    ]
+                },
+                {
+                    "name": "What is the purpose of the Domain Name System (DNS)?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "To encrypt data transmission",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "To convert domain names to IP addresses",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "To compress files",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "To authenticate users",
+                            "is_correct": false
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Opće znanje runda",
+            "num_of_questions": 10,
+            "questions": [
+                {
+                    "name": "Which planet is known as the Red Planet?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Earth",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Venus",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Mars",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "Jupiter",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "Who wrote 'To Kill a Mockingbird'?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Harper Lee",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "J.K. Rowling",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Stephen King",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "George Orwell",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "What is the capital city of France?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Berlin",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Madrid",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Paris",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "Rome",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "Who painted the Mona Lisa?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Vincent van Gogh",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Leonardo da Vinci",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "Pablo Picasso",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Michelangelo",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "What is the chemical symbol for water?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "H2O",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "CO2",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "O2",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "NaCl",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "Which animal is known as the 'King of the Jungle'?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Lion",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "Tiger",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Elephant",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Giraffe",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "Who wrote 'Romeo and Juliet'?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "William Shakespeare",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "Jane Austen",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Charles Dickens",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Mark Twain",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "What is the tallest mammal?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Hippopotamus",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Elephant",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Giraffe",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "Whale",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "Which country is famous for its tulips?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Netherlands",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "Italy",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "France",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Turkey",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "name": "What is the largest ocean in the world?",
+                    "num_of_points": 2,
+                    "num_of_answers": 4,
+                    "answers": [
+                        {
+                            "answer": "Atlantic Ocean",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Indian Ocean",
+                            "is_correct": false
+                        },
+                        {
+                            "answer": "Pacific Ocean",
+                            "is_correct": true
+                        },
+                        {
+                            "answer": "Arctic Ocean",
+                            "is_correct": false
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

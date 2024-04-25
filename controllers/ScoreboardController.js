@@ -1,11 +1,9 @@
 'use strict'
 
-const ApiFeatures = require('../utils/ApiFeatures');
 const Quiz = require('../models/Quiz');
 const ApiError = require('../utils/ApiError');
 
 
-//User dohvaca scoreboard kviza (samo kviz u kojem je njegov tim) po nekom ID-u
 exports.getScoreboard = async function (req, res, next) {
     try {
 

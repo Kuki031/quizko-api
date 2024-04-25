@@ -80,8 +80,8 @@ const quizSchema = new mongoose.Schema({
                     },
                     num_of_answers: {
                         type: Number,
-                        enum: [2, 4, 0],
-                        required: [true, "Morate unjeti nešto od sljedećeg: 2,4 ili 0 ponuđenih odgovora"]
+                        enum: [2, 4, 1],
+                        required: [true, "Morate unjeti nešto od sljedećeg: 2,4 ili 1 ponuđenih odgovora"]
                     },
                     answers: [
                         {
