@@ -4,14 +4,17 @@
 const Quiz = require('../models/Quiz');
 const ApiError = require('../utils/ApiError');
 const Pagination = require('../utils/Pagination');
+const checkDuplicate = require('../utils/Duplicate');
 
 exports.newQuestion = async function (req, res, next) {
     try {
         const round = await Quiz.findOne({ "rounds._id": req.params.roundid }, { "rounds.$": 1 });
         if (!round) throw new ApiError("Runda ne postoji.", 404);
 
-        const checkDuplicate = round.rounds[0].questions.find(question => question.name === req.body.name);
-        if (checkDuplicate) throw new ApiError(`Pitanje "${req.body.name}" već postoji.`, 400);
+
+        let checkForDups = checkDuplicate(round.rounds[0].questions, req.body)
+        if (checkForDups) throw new ApiError(`Pitanje "${req.body.name}" već postoji.`, 400);
+
 
         if (round.rounds[0].num_of_questions === round.rounds[0].questions.length) throw new ApiError("Dosegnut kapacitet broja pitanja u rundi.", 400);
 

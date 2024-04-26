@@ -2,7 +2,7 @@
 
 const Quiz = require('../models/Quiz');
 const ApiError = require('../utils/ApiError');
-
+const checkDuplicate = require('../utils/Duplicate');
 
 exports.createNewRoundForQuiz = async function (req, res, next) {
     try {
@@ -10,8 +10,8 @@ exports.createNewRoundForQuiz = async function (req, res, next) {
         if (!quiz) throw new ApiError("Kviz ne postoji.", 404);
         if (!req.user.hasCreatedQuiz(req.user, quiz)) throw new ApiError("Niste kreirali ovaj kviz.", 403);
 
-        const checkDuplicate = quiz.rounds.find(round => round.name === req.body.name);
-        if (checkDuplicate) throw new ApiError(`Runda "${req.body.name}" već postoji.`, 400);
+        let checkForDups = checkDuplicate(quiz.rounds, req.body)
+        if (checkForDups) throw new ApiError(`Pitanje "${req.body.name}" već postoji.`, 400);
         if (quiz.rounds.length === quiz.num_of_rounds) throw new ApiError("Dosegnut kapacitet broja rundi u kvizu.", 400);
 
         else quiz.rounds.push({

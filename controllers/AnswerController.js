@@ -51,7 +51,6 @@ exports.createNewAnswerForQuestion = async function (req, res, next) {
         );
 
         const newAnswer = question.answers.find(answer => answer.answer === req.body.answer);
-        console.log(newAnswer);
         res.status(201).json({
             status: 'success',
             message: "Odgovor kreiran."

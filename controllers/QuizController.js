@@ -10,14 +10,13 @@ exports.createQuiz = async function (req, res, next) {
         const quiz = await Quiz.create({
             name: req.body.name,
             description: req.body.description,
-            is_locked: req.body.is_locked,
             starts_at: req.body.starts_at,
             num_of_rounds: req.body.num_of_rounds,
             ends_at: req.body.ends_at,
             date_to_signup: req.body.date_to_signup,
             created_by: req.user.id,
             scoreboard: {
-                name: `${req.body.name}-scoreboard`
+                name: `${req.body.name} - bodovna ljestvica`
             }
         });
         await User.findByIdAndUpdate(req.user.id, {

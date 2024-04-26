@@ -29,15 +29,16 @@ app.use(sanitizer.clean({
     xss: true,
     noSql: true,
     sql: true
-}, ["/api/v1/quizzes"]))
+}, [], ["like"]))
 app.use(compression());
 app.use(cookieParser());
 app.use(express.urlencoded({
     extended: true,
     limit: '10kb'
 }))
-//Add hpp whitelisting
-
+app.use(hpp({
+    whitelist: ["page", "limit"]
+}))
 
 
 app.use('/api/v1/users', UserRouter);

@@ -2,6 +2,8 @@
 
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
+const teamSchema = require('./Team');
+const roundSchema = require('./Round');
 
 const quizSchema = new mongoose.Schema({
     name: {
@@ -36,63 +38,17 @@ const quizSchema = new mongoose.Schema({
         required: [true, "Morate unjeti broj rundi"]
     },
     scoreboard: {
-        name: {
-            type: String
-        },
+        name: String,
         num_of_teams: {
             type: Number,
             default: 0
         },
         teams: [
-            {
-                name: {
-                    type: String
-                },
-                points_earned: {
-                    type: Number,
-                    default: 0
-                }
-            }
+            teamSchema
         ]
     },
     rounds: [
-        {
-            name: {
-                type: String,
-                maxLength: 60
-            },
-            num_of_questions: {
-                type: Number,
-                required: [true, "Morate unjeti broj pitanja za rundu."]
-            },
-            questions: [
-                {
-                    name: {
-                        type: String,
-                    },
-                    num_of_points: {
-                        type: Number,
-                        default: 1
-                    },
-                    num_of_answers: {
-                        type: Number,
-                        enum: [2, 4, 1],
-                        required: [true, "Morate unjeti nešto od sljedećeg: 2,4 ili 1 ponuđenih odgovora"]
-                    },
-                    answers: [
-                        {
-                            answer: {
-                                type: String
-                            },
-                            is_correct: {
-                                type: Boolean,
-                                default: false
-                            }
-                        }
-                    ]
-                }
-            ],
-        }
+        roundSchema
     ],
 }, {
     toJSON: { virtuals: true },
@@ -100,7 +56,17 @@ const quizSchema = new mongoose.Schema({
     timestamps: true
 })
 
+
+quizSchema.index({ 'rounds.questions.answers._id': 1 });
+quizSchema.index({ 'rounds.questions._id': 1 });
+quizSchema.index({
+    'rounds.questions._id': 1,
+    'rounds.questions.answers._id': 1
+});
+quizSchema.index({ 'rounds._id': 1 });
+quizSchema.index({ 'scoreboard.teams._id': 1 });
 quizSchema.plugin(uniqueValidator);
+
 
 quizSchema.methods.hasReachedDeadline = (quiz) => Date.now() > quiz.date_to_signup.getTime();
 quizSchema.methods.isInProgress = (quiz, currentDate) => quiz.starts_at <= currentDate && currentDate < quiz.ends_at;
