@@ -10,7 +10,6 @@ exports.createQuiz = async function (req, res, next) {
         const quiz = await Quiz.create({
             name: req.body.name,
             description: req.body.description,
-            category: req.body.category,
             is_locked: req.body.is_locked,
             starts_at: req.body.starts_at,
             num_of_rounds: req.body.num_of_rounds,
@@ -37,7 +36,7 @@ exports.createQuiz = async function (req, res, next) {
 
 exports.getQuiz = async function (req, res, next) {
     try {
-        const quiz = await Quiz.findById(req.params.id).populate("category");
+        const quiz = await Quiz.findById(req.params.id);
         if (!quiz) throw new ApiError(`Kviz sa ID-em ${req.params.id} ne postoji.`, 404);
 
         res.status(200).json({
