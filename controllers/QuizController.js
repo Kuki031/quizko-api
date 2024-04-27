@@ -12,7 +12,7 @@ exports.createQuiz = async function (req, res, next) {
             description: req.body.description,
             starts_at: req.body.starts_at,
             num_of_rounds: req.body.num_of_rounds,
-            ends_at: req.body.ends_at,
+            //ends_at: req.body.ends_at,
             date_to_signup: req.body.date_to_signup,
             created_by: req.user.id,
             scoreboard: {
