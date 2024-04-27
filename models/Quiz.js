@@ -21,10 +21,10 @@ const quizSchema = new mongoose.Schema({
         type: Date,
         required: [true, "Morate unjeti vrijeme početka kviza."]
     },
-    ends_at: {
+    /*ends_at: {
         type: Date,
         required: [true, "Morate unjeti vrijeme završetka kviza."]
-    },
+    },*/
     date_to_signup: {
         type: Date,
         required: [true, "Morate unjeti datum do kada se primaju prijave za kviz."]
