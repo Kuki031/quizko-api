@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
 const teamSchema = require('./Team');
 const roundSchema = require('./Round');
+const prizeSchema = require('./Prize');
 
 const quizSchema = new mongoose.Schema({
     name: {
@@ -17,14 +18,13 @@ const quizSchema = new mongoose.Schema({
         type: String,
         default: 'Nema opisa.'
     },
-    starts_at: {
-        type: Date,
-        required: [true, "Morate unjeti vrijeme početka kviza."]
+    category: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Category'
     },
-    /*ends_at: {
-        type: Date,
-        required: [true, "Morate unjeti vrijeme završetka kviza."]
-    },*/
+    prizes: [
+        prizeSchema
+    ],
     date_to_signup: {
         type: Date,
         required: [true, "Morate unjeti datum do kada se primaju prijave za kviz."]
@@ -64,13 +64,12 @@ quizSchema.index({
     'rounds.questions.answers._id': 1
 });
 quizSchema.index({ 'rounds._id': 1 });
+quizSchema.index({ 'prizes._id': 1 });
 quizSchema.index({ 'scoreboard.teams._id': 1 });
 quizSchema.plugin(uniqueValidator);
 
 
 quizSchema.methods.hasReachedDeadline = (quiz) => Date.now() > quiz.date_to_signup.getTime();
-quizSchema.methods.isInProgress = (quiz, currentDate) => quiz.starts_at <= currentDate && currentDate < quiz.ends_at;
-
 
 const Quiz = mongoose.model('Quiz', quizSchema);
 module.exports = Quiz;

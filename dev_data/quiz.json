@@ -1,8 +1,21 @@
 {
     "name": "Božićni kviz",
     "description": "Ovo je Božićni kviz.",
-    "starts_at": "2024-05-06 18:00:00",
-    "ends_at": "2024-05-06 21:00:00",
+    "category": "6633c271f7cdc44237df9744",
+    "prizes": [
+        {
+            "name": "Boca Pelina",
+            "place": 1
+        },
+        {
+            "name": "Dva piva",
+            "place": 2
+        },
+        {
+            "name": "Jedno pivo",
+            "place": 3
+        }
+    ],
     "date_to_signup": "2024-05-04 16:00:00",
     "created_by": "6626b0b6d71d4661645cd529",
     "num_of_rounds": 4,

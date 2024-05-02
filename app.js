@@ -11,10 +11,12 @@ const hpp = require('hpp');
 const ErrorController = require('./controllers/ErrorController');
 const UserRouter = require('./routes/UserRoutes');
 const QuizRouter = require('./routes/QuizRoutes');
-const scoreboardRouter = require('./routes/ScoreboardRoutes');
+const ScoreboardRouter = require('./routes/ScoreboardRoutes');
 const RoundRouter = require('./routes/RoundRoutes');
 const QuestionRouter = require('./routes/QuestionRoutes');
 const AnswerRouter = require('./routes/AnswerRoutes');
+const CategoryRouter = require('./routes/CategoryRoutes');
+const PrizeRouter = require('./routes/PrizeRoutes');
 
 const app = express();
 
@@ -42,8 +44,9 @@ app.use(hpp({
 
 
 app.use('/api/v1/users', UserRouter);
-app.use('/api/v1/quizzes', QuizRouter, RoundRouter, QuestionRouter, AnswerRouter);
-app.use('/api/v1/scoreboards', scoreboardRouter);
+app.use('/api/v1/quizzes', QuizRouter, RoundRouter, QuestionRouter, AnswerRouter, PrizeRouter);
+app.use('/api/v1/scoreboards', ScoreboardRouter);
+app.use('/api/v1/categories', CategoryRouter);
 app.use(ErrorController);
 
 module.exports = app;
