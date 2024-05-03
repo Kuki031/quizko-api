@@ -16,8 +16,15 @@ const upload = multer({
 exports.createQuiz = async function (req, res, next) {
     try {
         upload.single('image')(req, res, async function (err) {
-            if (err instanceof multer.MulterError) throw new ApiError("Greška prilikom učitavanja slike.", 400);
-            else if (err) throw new ApiError("Nešto nije u redu.", 500);
+            if (err instanceof multer.MulterError) {
+                return next(new ApiError("Greška prilikom učitavanja slike.", 400));
+            } else if (err) {
+                return next(new ApiError("Nešto nije u redu.", 500));
+            }
+
+            if (!req.file) {
+                return next(new ApiError("Niste odabrali sliku.", 400));
+            }
 
             try {
                 const resizedImageBuffer = await sharp(req.file.buffer)
