@@ -7,7 +7,7 @@ const restrictAccess = require('../middlewares/restrictAccess');
 const categoryRouter = express.Router();
 
 
-categoryRouter.use(isLoggedIn, restrictAccess);
+categoryRouter.use(isLoggedIn);
 categoryRouter.route('/').post(CategoryController.createCategory).get(CategoryController.getAllCategories);
 categoryRouter.route('/quizzes-by-category').get(CategoryController.getQuizzesByCategories);
 categoryRouter.route('/:id').get(CategoryController.getSingleCategory).patch(CategoryController.updateCategory);
