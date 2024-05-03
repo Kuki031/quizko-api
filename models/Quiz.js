@@ -5,6 +5,7 @@ const uniqueValidator = require('mongoose-unique-validator');
 const teamSchema = require('./Team');
 const roundSchema = require('./Round');
 const prizeSchema = require('./Prize');
+const imageSchema = require('./Image');
 
 const quizSchema = new mongoose.Schema({
     name: {
@@ -18,6 +19,7 @@ const quizSchema = new mongoose.Schema({
         type: String,
         default: 'Nema opisa.'
     },
+    image: imageSchema,
     category: {
         type: mongoose.Schema.ObjectId,
         ref: 'Category'

@@ -1,52 +1,87 @@
 'use strict'
 
+const sharp = require('sharp');
+const multer = require('multer');
 const Quiz = require('../models/Quiz');
 const User = require('../models/User');
 const ApiError = require('../utils/ApiError');
 const Pagination = require('../utils/Pagination');
 
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 2 * 1024 * 1024 }
+});
+
+
 exports.createQuiz = async function (req, res, next) {
     try {
-        const quiz = await Quiz.create({
-            name: req.body.name,
-            description: req.body.description,
-            category: req.body.category,
-            prizes: req.body.prizes,
-            num_of_rounds: req.body.num_of_rounds,
-            date_to_signup: req.body.date_to_signup,
-            created_by: req.user.id,
-            scoreboard: {
-                name: `${req.body.name} - bodovna ljestvica`
+        upload.single('image')(req, res, async function (err) {
+            if (err instanceof multer.MulterError) throw new ApiError("Greška prilikom učitavanja slike.", 400);
+            else if (err) throw new ApiError("Nešto nije u redu.", 500);
+
+            try {
+                const resizedImageBuffer = await sharp(req.file.buffer)
+                    .resize({ width: 640, height: 360 })
+                    .jpeg({ quality: 80 })
+                    .toBuffer();
+
+                const imageData = {
+                    data: resizedImageBuffer,
+                    contentType: 'image/jpg'
+                };
+
+                const quiz = await Quiz.create({
+                    name: req.body.name,
+                    description: req.body.description,
+                    category: req.body.category,
+                    prizes: req.body.prizes,
+                    num_of_rounds: req.body.num_of_rounds,
+                    date_to_signup: req.body.date_to_signup,
+                    created_by: req.user.id,
+                    scoreboard: {
+                        name: `${req.body.name} - bodovna ljestvica`
+                    },
+                    image: imageData
+                });
+
+                await User.findByIdAndUpdate(req.user.id, {
+                    $push: { saved_quizzes: quiz.id }
+                });
+
+                res.status(201).json({
+                    status: 'success',
+                    quiz
+                });
+
+            } catch (err) {
+                return next(err);
             }
         });
-        await User.findByIdAndUpdate(req.user.id, {
-            $push: { saved_quizzes: quiz.id }
-        })
-        res.status(201).json({
-            status: 'success',
-            quiz
-        })
 
-    }
-    catch (err) {
+    } catch (err) {
         return next(err);
     }
 }
 
 exports.getQuiz = async function (req, res, next) {
     try {
-        const quiz = await Quiz.findById(req.params.id).populate("category");
-        if (!quiz) throw new ApiError(`Kviz sa ID-em ${req.params.id} ne postoji.`, 404);
+        const quiz = await Quiz.findById(req.params.id)
+            .populate('category')
+            .select('+image');
+
+        if (!quiz) {
+            throw new ApiError(`Kviz sa ID-em ${req.params.id} ne postoji.`, 404);
+        }
 
         res.status(200).json({
             status: 'success',
             quiz
-        })
-    }
-    catch (err) {
+        });
+    } catch (err) {
         return next(err);
     }
 }
+
 
 exports.getAllQuizzes = async function (req, res, next) {
     try {
