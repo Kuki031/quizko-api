@@ -18,10 +18,9 @@ exports.newQuestion = async function (req, res, next) {
 
         if (round.rounds[0].num_of_questions === round.rounds[0].questions.length) throw new ApiError("Dosegnut kapacitet broja pitanja u rundi.", 400);
 
-
         const newQuestion = await Quiz.findOneAndUpdate(
             { "rounds._id": req.params.roundid },
-            { $push: { "rounds.$.questions": { "name": req.body.name, "num_of_points": req.body.num_of_points, "num_of_answers": req.body.num_of_answers } } },
+            { $push: { "rounds.$.questions": { "name": req.body.name, "num_of_points": req.body.num_of_points, "num_of_answers": req.body.num_of_answers, image: { data: req.file, contentType: 'image/jpeg' } } } },
             { runValidators: true, new: true }
         );
 
@@ -38,13 +37,20 @@ exports.newQuestion = async function (req, res, next) {
 
 exports.editQuestion = async function (req, res, next) {
     try {
+
+        if (req.file) req.body.image = {
+            data: req.file,
+            contentType: 'image/jpeg'
+        }
+
         const question = await Quiz.findOneAndUpdate(
             { "rounds.questions._id": req.params.questionid },
             {
                 $set: {
                     "rounds.$[outer].questions.$[inner].name": req.body.name,
                     "rounds.$[outer].questions.$[inner].num_of_points": req.body.num_of_points,
-                    "rounds.$[outer].questions.$[inner].num_of_answers": req.body.num_of_answers
+                    "rounds.$[outer].questions.$[inner].num_of_answers": req.body.num_of_answers,
+                    "rounds.$[outer].questions.$[inner].image": req.body.image
                 }
             },
             {
