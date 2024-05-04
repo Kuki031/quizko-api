@@ -3,8 +3,14 @@
 const mongoose = require('mongoose');
 
 const prizeSchema = new mongoose.Schema({
-    name: String,
-    place: Number
+    name: {
+        type: String,
+        trim: true
+    },
+    place: {
+        type: Number,
+        min: 1
+    }
 });
 
 module.exports = prizeSchema;

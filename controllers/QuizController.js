@@ -1,63 +1,39 @@
 'use strict'
 
-const sharp = require('sharp');
-const multer = require('multer');
 const Quiz = require('../models/Quiz');
 const User = require('../models/User');
 const ApiError = require('../utils/ApiError');
 const Pagination = require('../utils/Pagination');
 
-const upload = multer({
-    storage: multer.memoryStorage(),
-    limits: { fileSize: 2 * 1024 * 1024 }
-});
-
 
 exports.createQuiz = async function (req, res, next) {
     try {
-        upload.single('image')(req, res, async function (err) {
-            if (err instanceof multer.MulterError) throw new ApiError("Greška prilikom učitavanja slike.", 400);
-            else if (!req.file) throw new ApiError("Niste odabrali sliku.", 400);
-            if (err) throw new ApiError("Nešto nije u redu.", 500);
-
-            try {
-                const resizedImageBuffer = await sharp(req.file.buffer)
-                    .resize({ width: 640, height: 360 })
-                    .jpeg({ quality: 80 })
-                    .toBuffer();
-
-                const imageData = {
-                    data: resizedImageBuffer,
-                    contentType: 'image/jpeg'
-                };
-
-                const quiz = await Quiz.create({
-                    name: req.body.name,
-                    description: req.body.description,
-                    category: req.body.category,
-                    prizes: req.body.prizes,
-                    num_of_rounds: req.body.num_of_rounds,
-                    date_to_signup: req.body.date_to_signup,
-                    created_by: req.user.id,
-                    scoreboard: {
-                        name: `${req.body.name} - bodovna ljestvica`
-                    },
-                    image: imageData
-                });
-
-                await User.findByIdAndUpdate(req.user.id, {
-                    $push: { saved_quizzes: quiz.id }
-                });
-
-                res.status(201).json({
-                    status: 'success',
-                    quiz
-                });
-
-            } catch (err) {
-                return next(err);
+        const quiz = await Quiz.create({
+            name: req.body.name,
+            description: req.body.description,
+            category: req.body.category,
+            prizes: req.body.prizes,
+            num_of_rounds: req.body.num_of_rounds,
+            date_to_signup: req.body.date_to_signup,
+            created_by: req.user.id,
+            scoreboard: {
+                name: `${req.body.name} - bodovna ljestvica`
+            },
+            image: {
+                data: req.file,
+                contentType: 'image/jpeg'
             }
         });
+
+        await User.findByIdAndUpdate(req.user.id, {
+            $push: { saved_quizzes: quiz.id }
+        });
+
+        res.status(201).json({
+            status: 'success',
+            quiz
+        });
+
 
     } catch (err) {
         return next(err);
@@ -100,6 +76,10 @@ exports.getAllQuizzes = async function (req, res, next) {
 
 exports.updateQuiz = async function (req, res, next) {
     try {
+        if (req.file) req.body.image = {
+            data: req.file,
+            contentType: 'image/jpeg'
+        }
 
         const quiz = await Quiz.findByIdAndUpdate(req.params.id, req.body, {
             runValidators: true,
@@ -137,6 +117,7 @@ exports.deleteQuiz = async function (req, res, next) {
         return next(err);
     }
 }
+
 
 exports.getUserQuizzes = async function (req, res, next) {
     try {

@@ -6,6 +6,7 @@ const questionSchema = require('./Question');
 const roundSchema = new mongoose.Schema({
     name: {
         type: String,
+        trim: true,
         maxLength: 60
     },
     num_of_questions: {

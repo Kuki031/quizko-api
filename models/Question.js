@@ -6,6 +6,7 @@ const answerSchema = require('./Answer');
 const questionSchema = new mongoose.Schema({
     name: {
         type: String,
+        trim: true
     },
     num_of_points: {
         type: Number,

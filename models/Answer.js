@@ -4,7 +4,8 @@ const mongoose = require('mongoose');
 
 const answerSchema = new mongoose.Schema({
     answer: {
-        type: String
+        type: String,
+        trim: true
     },
     is_correct: {
         type: Boolean,

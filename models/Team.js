@@ -5,6 +5,7 @@ const teamSchema = new mongoose.Schema({
 
     name: {
         type: String,
+        trim: true
     },
     points_earned: {
         type: Number,
