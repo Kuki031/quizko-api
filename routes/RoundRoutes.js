@@ -8,7 +8,7 @@ const isLoggedIn = require('../middlewares/isLoggedIn');
 const roundRouter = express.Router();
 
 
-roundRouter.use(isLoggedIn, restrictAccess);
+roundRouter.use(isLoggedIn);
 roundRouter.route('/rounds/:id').get(RoundController.getAllRoundsForQuiz);
 roundRouter.route('/:id/new-round').post(RoundController.createNewRoundForQuiz);
 roundRouter.route('/edit-round/:roundid').patch(restrictQuizOps(["roundid"], ["rounds._id"]), RoundController.editRoundForQuiz);
