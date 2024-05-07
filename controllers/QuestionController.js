@@ -24,12 +24,11 @@ exports.newQuestion = async function (req, res, next) {
             { runValidators: true, new: true }
         );
 
-        //const question_id = round.questions[round.questions.length - 1]._id;
+        const question_id = round.rounds[round.rounds.length - 1].questions[questions.length - 1]._id;
 
         res.status(201).json({
             status: 'success',
-            round: round,
-            newQuestion
+            id: question_id
         })
     }
     catch (err) {
