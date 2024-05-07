@@ -24,7 +24,7 @@ exports.newQuestion = async function (req, res, next) {
             { runValidators: true, new: true }
         );
 
-        const last_round = round.rounds[round.rounds.length - 1];
+        const last_round = newQuestion.rounds[newQuestion.rounds.length - 1];
         const question_id = last_round.questions[last_round.questions.length - 1]._id;
 
         res.status(201).json({
