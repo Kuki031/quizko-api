@@ -17,6 +17,7 @@ const QuestionRouter = require('./routes/QuestionRoutes');
 const AnswerRouter = require('./routes/AnswerRoutes');
 const CategoryRouter = require('./routes/CategoryRoutes');
 const PrizeRouter = require('./routes/PrizeRoutes');
+const SSERouter = require('./routes/SSERoutes');
 
 const app = express();
 
@@ -47,6 +48,7 @@ app.use('/api/v1/users', UserRouter);
 app.use('/api/v1/quizzes', QuizRouter, RoundRouter, QuestionRouter, AnswerRouter, PrizeRouter);
 app.use('/api/v1/scoreboards', ScoreboardRouter);
 app.use('/api/v1/categories', CategoryRouter);
+app.use('/api/v1/events', SSERouter);
 app.use(ErrorController);
 
 module.exports = app;
