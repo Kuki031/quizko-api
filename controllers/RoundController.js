@@ -11,7 +11,7 @@ exports.createNewRoundForQuiz = async function (req, res, next) {
         if (!req.user.hasCreatedQuiz(req.user, quiz)) throw new ApiError("Niste kreirali ovaj kviz.", 403);
 
         let checkForDups = checkDuplicate(quiz.rounds, req.body)
-        if (checkForDups) throw new ApiError(`Pitanje "${req.body.name}" već postoji.`, 400);
+        if (checkForDups) throw new ApiError(`Runda "${req.body.name}" već postoji.`, 400);
         if (quiz.rounds.length === quiz.num_of_rounds) throw new ApiError("Dosegnut kapacitet broja rundi u kvizu.", 400);
 
         else quiz.rounds.push({
@@ -21,9 +21,12 @@ exports.createNewRoundForQuiz = async function (req, res, next) {
 
         await quiz.save();
 
+        const round_id = quiz.rounds[quiz.rounds.length - 1]._id;
+
         res.status(201).json({
             status: 'success',
-            round: req.body.name
+            round: req.body.name,
+            id: round_id
         })
     }
 

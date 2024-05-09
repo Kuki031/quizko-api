@@ -7,7 +7,7 @@ const restrictAccess = require('../middlewares/restrictAccess');
 const isLoggedIn = require('../middlewares/isLoggedIn');
 const answerRouter = express.Router();
 
-answerRouter.use(isLoggedIn, restrictAccess);
+answerRouter.use(isLoggedIn);
 
 //Answers for questions
 answerRouter.route('/new-answer/:questionid').post(restrictQuizOps(["questionid"], ["rounds.questions._id"]), AnswerController.createNewAnswerForQuestion);
