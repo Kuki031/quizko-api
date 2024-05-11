@@ -10,7 +10,6 @@ const imageSchema = require('./Image');
 const quizSchema = new mongoose.Schema({
     name: {
         type: String,
-        unique: true,
         trim: true,
         maxLength: 60,
         required: [true, "Morate unjeti ime kviza."]
