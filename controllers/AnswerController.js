@@ -10,8 +10,11 @@ exports.createNewAnswerForQuestion = async function (req, res, next) {
             "rounds.questions._id": req.params.questionid,
             "rounds.questions.answers": {
                 $elemMatch: {
-                    answer: req.body.answer,
-                    is_correct: req.body.is_correct
+                    _id: req.params.questionid,
+                    "answers": {
+                        answer: req.body.answer,
+                        is_correct: req.body.is_correct
+                    }
                 }
             }
         });
