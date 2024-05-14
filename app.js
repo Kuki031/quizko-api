@@ -44,7 +44,8 @@ app.use(hpp({
 }))
 
 
-app.use('/api/v1/users', UserRouter, TeamRouter);
+app.use('/api/v1/users', UserRouter);
+app.use('/api/v1/teams', TeamRouter);
 app.use('/api/v1/quizzes', QuizRouter, RoundRouter, QuestionRouter, AnswerRouter, PrizeRouter);
 app.use('/api/v1/scoreboards', ScoreboardRouter);
 app.use('/api/v1/categories', CategoryRouter);
