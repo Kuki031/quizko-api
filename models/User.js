@@ -41,6 +41,14 @@ const userSchema = new mongoose.Schema({
         },
         select: false
     },
+    belongs_to_team: {
+        type: Boolean,
+        default: false
+    },
+    team: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Team'
+    },
     role: {
         type: String,
         enum: ['Administrator', 'Moderator', 'Guest'],
@@ -67,7 +75,7 @@ userSchema.methods.comparePw = async function (providedPw, storedPw) {
     return await bcrypt.compare(providedPw, storedPw);
 }
 userSchema.methods.hasCreatedQuiz = (user, quiz) => user.id === quiz.created_by.toString();
-
+userSchema.methods.hasCreatedTeam = (user, team) => user.id === team.created_by.toString();
 
 const User = mongoose.model('User', userSchema);
 module.exports = User;

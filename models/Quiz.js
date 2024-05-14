@@ -2,7 +2,6 @@
 
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
-const teamSchema = require('./Team');
 const roundSchema = require('./Round');
 const prizeSchema = require('./Prize');
 const imageSchema = require('./Image');
@@ -45,7 +44,10 @@ const quizSchema = new mongoose.Schema({
             default: 0
         },
         teams: [
-            teamSchema
+            {
+                type: mongoose.Schema.ObjectId,
+                ref: 'Team'
+            }
         ]
     },
     rounds: [
@@ -66,7 +68,6 @@ quizSchema.index({
 });
 quizSchema.index({ 'rounds._id': 1 });
 quizSchema.index({ 'prizes._id': 1 });
-quizSchema.index({ 'scoreboard.teams._id': 1 });
 quizSchema.plugin(uniqueValidator);
 
 quizSchema.methods.hasReachedDeadline = (quiz) => Date.now() > quiz.date_to_signup.getTime();

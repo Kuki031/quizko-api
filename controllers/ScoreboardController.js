@@ -1,20 +1,23 @@
 'use strict'
 
 const Quiz = require('../models/Quiz');
+const Team = require('../models/Team');
 const ApiError = require('../utils/ApiError');
 
 
 exports.getScoreboard = async function (req, res, next) {
     try {
 
-        const scoreboard = await Quiz.findById(req.params.id).select("name scoreboard.teams");
+        const scoreboard = await Quiz.findById(req.params.id).select("scoreboard");
         if (!scoreboard) throw new ApiError("Bodovna ljestvica ne postoji.", 404);
+        await scoreboard.scoreboard.populate("teams");
+
         scoreboard.scoreboard.teams.sort((a, b) => b.points_earned - a.points_earned);
 
         res.status(200).json({
             status: 'success',
             data: {
-                scoreboard: scoreboard.scoreboard.name,
+                scoreboard: scoreboard.name,
                 scoreboard
             }
         })
@@ -25,7 +28,7 @@ exports.getScoreboard = async function (req, res, next) {
 }
 
 
-exports.createNewTeam = async function (req, res, next) {
+/*exports.createNewTeam = async function (req, res, next) {
     try {
 
         const fetchTeamsForDup = await Quiz.findById(req.params.id).select("scoreboard.teams");
@@ -50,22 +53,19 @@ exports.createNewTeam = async function (req, res, next) {
     catch (err) {
         return next(err);
     }
-}
+}*/
 
 
-//Updateanje tima na scoreboardu (samo admin kviza)
 exports.updateTeamOnScoreboard = async function (req, res, next) {
     try {
 
-        const team = await Quiz.findOneAndUpdate({ "scoreboard.teams._id": req.params.id }, {
-            $set: {
-                "scoreboard.teams.$.name": req.body.name,
-                "scoreboard.teams.$.points_earned": req.body.points_earned
-            }
-        }, {
-            runValidators: true,
-            new: true
-        });
+        const team = await Team.findByIdAndUpdate(req.params.id, {
+            points_earned: req.body.points_earned
+        },
+            {
+                runValidators: true,
+                new: true
+            })
 
         if (!team) throw new ApiError(`Tim sa ID-em ${req.params.id} ne postoji.`, 404);
 

@@ -16,11 +16,11 @@ const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST;
 connectDB(process.env.MONGO_CONNECTION_STRING, process.env.MONGO_PASSWORD);
 
-process.on('SIGTERM', async () => {
-    console.info('SIGTERM signal received. Cleaning up and shutting down.');
-    await cleanUp();
-    process.exit(0);
-});
+// process.on('SIGTERM', async () => {
+//     console.info('SIGTERM signal received. Cleaning up and shutting down.');
+//     await cleanUp();
+//     process.exit(0);
+// });
 
 
 const server = app.listen(PORT, HOST, () => {

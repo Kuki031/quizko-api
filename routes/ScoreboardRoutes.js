@@ -11,7 +11,7 @@ scoreboardRouter.use(isLoggedIn);
 scoreboardRouter.route('/scoreboard/:id').get(scoreboardController.getScoreboard);
 
 scoreboardRouter.use(restrictAccess);
-scoreboardRouter.route('/:id/create-team').post(scoreboardController.createNewTeam);
+// scoreboardRouter.route('/:id/create-team').post(scoreboardController.createNewTeam);
 scoreboardRouter.route('/update-scoreboard/:id').patch(scoreboardController.updateTeamOnScoreboard);
 
 

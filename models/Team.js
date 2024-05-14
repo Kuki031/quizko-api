@@ -5,12 +5,23 @@ const teamSchema = new mongoose.Schema({
 
     name: {
         type: String,
-        trim: true
+        trim: true,
+        required: [true, "Morate unjeti ime tima."]
     },
     points_earned: {
         type: Number,
         default: 0
+    },
+    created_by: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
     }
+}, {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+    timestamps: true
 })
 
-module.exports = teamSchema;
+
+const Team = mongoose.model('Team', teamSchema);
+module.exports = Team;
