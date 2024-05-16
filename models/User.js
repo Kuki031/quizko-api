@@ -45,6 +45,11 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    email_confirmation_token: String,
+    has_confirmed_email: {
+        type: Boolean,
+        default: false
+    },
     team: {
         type: mongoose.Schema.ObjectId,
         ref: 'Team'

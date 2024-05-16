@@ -17,6 +17,7 @@
     "perfect-express-sanitizer": "^1.0.14",
     "sharp": "^0.33.3",
     "slugify": "^1.6.6",
+    "uuid": "^9.0.1",
     "validator": "^13.11.0"
   },
   "scripts": {

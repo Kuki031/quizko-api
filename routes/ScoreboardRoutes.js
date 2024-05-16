@@ -4,10 +4,11 @@ const express = require('express');
 const scoreboardController = require('../controllers/ScoreboardController');
 const isLoggedIn = require('../middlewares/isLoggedIn');
 const restrictAccess = require('../middlewares/restrictAccess');
+const hasConfirmedEmail = require('../middlewares/hasConfirmedEmail');
 
 const scoreboardRouter = express.Router();
 
-scoreboardRouter.use(isLoggedIn);
+scoreboardRouter.use(isLoggedIn, hasConfirmedEmail);
 scoreboardRouter.route('/scoreboard/:id').get(scoreboardController.getScoreboard);
 
 scoreboardRouter.use(restrictAccess);

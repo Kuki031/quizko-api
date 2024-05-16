@@ -3,12 +3,12 @@
 const express = require('express');
 const RoundController = require('../controllers/RoundController');
 const restrictQuizOps = require('../middlewares/restrictQuizOps');
-const restrictAccess = require('../middlewares/restrictAccess');
 const isLoggedIn = require('../middlewares/isLoggedIn');
+const hasConfirmedEmail = require('../middlewares/hasConfirmedEmail');
 const roundRouter = express.Router();
 
 
-roundRouter.use(isLoggedIn);
+roundRouter.use(isLoggedIn, hasConfirmedEmail);
 roundRouter.route('/rounds/:id').get(RoundController.getAllRoundsForQuiz);
 roundRouter.route('/:id/new-round').post(RoundController.createNewRoundForQuiz);
 roundRouter.route('/edit-round/:roundid').patch(restrictQuizOps(["roundid"], ["rounds._id"]), RoundController.editRoundForQuiz);

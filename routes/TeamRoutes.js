@@ -3,10 +3,11 @@
 const express = require('express');
 const TeamController = require('../controllers/TeamController');
 const isLoggedIn = require('../middlewares/isLoggedIn');
+const hasConfirmedEmail = require('../middlewares/hasConfirmedEmail');
 const TeamRouter = express.Router();
 
 
-TeamRouter.use(isLoggedIn);
+TeamRouter.use(isLoggedIn, hasConfirmedEmail);
 TeamRouter.route('/new-team').post(TeamController.createTeam);
 TeamRouter.route('/my-team').get(TeamController.getMyTeam);
 TeamRouter.route('/join-quiz/:id').patch(TeamController.joinQuiz);

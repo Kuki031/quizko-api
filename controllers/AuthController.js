@@ -1,35 +1,30 @@
 'use strict'
 
-
-const jwt = require('jsonwebtoken');
+require('dotenv').config({ path: './config.env' });
 const User = require('../models/User');
 const ApiError = require('../utils/ApiError');
 const { transporter, sendMail } = require('../utils/Nodemailer')
-const dotenv = require('dotenv').config({ path: './config.env' });
-
+const RandomToken = require('../utils/RandomToken');
+const isProductionEnv = require('../utils/IsProduction');
+const signToken = require('../utils/SignToken');
 
 const cookieOptions = {
     expires: new Date(Date.now() + process.env.COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
     httpOnly: true
 }
-const signToken = function (id) {
-    return jwt.sign({ id: id }, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRES_IN
-    });
-}
-
-const isProductionEnv = () => process.env.NODE_ENV === 'production';
-
 
 
 //Registracija
 exports.register = async function (req, res, next) {
     try {
+
+        const emailToken = RandomToken();
         const newUser = await User.create({
             username: req.body.username,
             email: req.body.email,
             password: req.body.password,
             passwordConfirm: req.body.passwordConfirm,
+            email_confirmation_token: emailToken
         });
         const token = signToken(newUser._id);
         if (isProductionEnv()) cookieOptions.secure = true;
@@ -41,16 +36,88 @@ exports.register = async function (req, res, next) {
             },
             to: newUser.email,
             subject: "Dobrodošli u Quizko aplikaciju!",
-            text: "Uspješno ste se registrirali u aplikaciju!"
+            html: `<h2>Uspješno ste se registrirali u aplikaciju</h2>
+                    <p>Klikom na sljedeći <a href="${process.env.RENDER_HOST_EMAIL}/${newUser._id}/${emailToken}">link</a> možete aktivirati svoj račun.</p>
+                    <p>Nakon aktivacije računa, možete koristiti sve značajke aplikacije.</p>`
         }
 
-        sendMail(transporter, mailOptions);
+        try {
+            await sendMail(transporter, mailOptions);
+        }
+        catch (err) {
+            return next(new ApiError("E-mail se nije uspio poslati. Pokušajte ponovno.", 500));
+        }
 
         res.cookie("jwt", token, cookieOptions).status(201).json({
             status: 'success',
             data: newUser,
             token
         });
+    }
+    catch (err) {
+        return next(err);
+    }
+}
+
+
+exports.confirmEmailAddress = async function (req, res, next) {
+    let user;
+    try {
+        user = await User.findById(req.params.id);
+        if (!user) throw new ApiError("Korisnik ne postoji.", 404);
+
+        if (user.email_confirmation_token !== req.params.token) {
+            user.email_confirmation_token = undefined;
+            user.has_confirmed_email = false;
+            await user.save();
+            throw new ApiError("Tokeni se ne podudaraju. Ponovno pošaljite e-mail za aktivaciju računa.", 400);
+        }
+
+        user.email_confirmation_token = undefined;
+        user.has_confirmed_email = true;
+        await user.save();
+
+
+        res.status(200).json({
+            status: 'success',
+            message: 'E-mail adresa uspješno potvrđena.'
+        })
+    }
+    catch (err) {
+        return next(err);
+    }
+}
+
+exports.resendEmail = async function (req, res, next) {
+    try {
+        const user = await User.findById(req.user.id);
+        const emailToken = RandomToken();
+
+        user.email_confirmation_token = emailToken;
+        user.has_confirmed_email = false;
+        await user.save();
+
+        const mailOptions = {
+            from: {
+                name: 'Quizko edIT',
+                address: process.env.USER
+            },
+            to: user.email,
+            subject: "E-mail za aktivaciju računa",
+            html: `<p>Klikom na sljedeći <a href="${process.env.RENDER_HOST_EMAIL}/${user._id}/${emailToken}">link</a> možete aktivirati svoj račun.</p>`
+        }
+
+        try {
+            await sendMail(transporter, mailOptions);
+        }
+        catch (err) {
+            return next(new ApiError("E-mail se nije uspio poslati. Pokušajte ponovno.", 500));
+        }
+
+        res.status(200).json({
+            status: 'success',
+            message: "E-mail uspješno poslan."
+        })
     }
     catch (err) {
         return next(err);

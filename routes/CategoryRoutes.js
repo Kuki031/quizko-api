@@ -3,11 +3,11 @@
 const express = require('express');
 const CategoryController = require('../controllers/CategoryController');
 const isLoggedIn = require('../middlewares/isLoggedIn');
-const restrictAccess = require('../middlewares/restrictAccess');
+const hasConfirmedEmail = require('../middlewares/hasConfirmedEmail');
 const categoryRouter = express.Router();
 
 
-categoryRouter.use(isLoggedIn);
+categoryRouter.use(isLoggedIn, hasConfirmedEmail);
 categoryRouter.route('/').post(CategoryController.createCategory).get(CategoryController.getAllCategories);
 categoryRouter.route('/quizzes-by-category').get(CategoryController.getQuizzesByCategories);
 categoryRouter.route('/:id').get(CategoryController.getSingleCategory).patch(CategoryController.updateCategory);
