@@ -4,6 +4,8 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const ApiError = require('../utils/ApiError');
+const { transporter, sendMail } = require('../utils/Nodemailer')
+const dotenv = require('dotenv').config({ path: './config.env' });
 
 
 const cookieOptions = {
@@ -31,6 +33,19 @@ exports.register = async function (req, res, next) {
         });
         const token = signToken(newUser._id);
         if (isProductionEnv()) cookieOptions.secure = true;
+
+        const mailOptions = {
+            from: {
+                name: 'Quizko edIT',
+                address: process.env.USER
+            },
+            to: newUser.email,
+            subject: "Dobrodošli u Quizko aplikaciju!",
+            text: "Uspješno ste se registrirali u aplikaciju!"
+        }
+
+        sendMail(transporter, mailOptions);
+
         res.cookie("jwt", token, cookieOptions).status(201).json({
             status: 'success',
             data: newUser,

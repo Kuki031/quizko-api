@@ -68,6 +68,7 @@ quizSchema.index({
 });
 quizSchema.index({ 'rounds._id': 1 });
 quizSchema.index({ 'prizes._id': 1 });
+quizSchema.index({ 'scoreboard._id': 1 });
 quizSchema.plugin(uniqueValidator);
 
 quizSchema.methods.hasReachedDeadline = (quiz) => Date.now() > quiz.date_to_signup.getTime();
