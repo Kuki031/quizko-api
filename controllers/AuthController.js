@@ -7,17 +7,14 @@ const { transporter, sendMail } = require('../utils/Nodemailer')
 const RandomToken = require('../utils/RandomToken');
 const isProductionEnv = require('../utils/IsProduction');
 const signToken = require('../utils/SignToken');
-
-const cookieOptions = {
-    expires: new Date(Date.now() + process.env.COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
-    httpOnly: true
-}
+const Options = require('../utils/EmailOptions');
+const Cookie = require('../utils/CookieOptions');
 
 
 //Registracija
 exports.register = async function (req, res, next) {
     try {
-
+        const cookie = new Cookie('', '');
         const emailToken = RandomToken();
         const newUser = await User.create({
             username: req.body.username,
@@ -27,20 +24,14 @@ exports.register = async function (req, res, next) {
             email_confirmation_token: emailToken
         });
         const token = signToken(newUser._id);
-        if (isProductionEnv()) cookieOptions.secure = true;
+        if (isProductionEnv()) cookie._setAttributes();
 
-        const mailOptions = {
-            from: {
-                name: 'Quizko edIT',
-                address: process.env.USER
-            },
-            to: newUser.email,
-            subject: "Dobrodošli u Quizko aplikaciju!",
-            html: `<h2>Uspješno ste se registrirali u aplikaciju</h2>
-                    <p>Klikom na sljedeći <a href="${process.env.RENDER_HOST_EMAIL}/${newUser._id}/${emailToken}">link</a> možete aktivirati svoj račun.</p>
-                    <p>Nakon aktivacije računa, možete koristiti sve značajke aplikacije.</p>`
-        }
-
+        const html = `
+        <h2>Uspješno ste se registrirali u aplikaciju</h2>
+        <p>Klikom na sljedeći <a href="${process.env.RENDER_HOST_EMAIL}/${newUser._id}/${emailToken}">link</a> možete aktivirati svoj račun.</p>
+        <p>Nakon aktivacije računa, možete koristiti sve značajke aplikacije.</p>
+        `
+        const mailOptions = new Options({ name: 'Quizko edIT', address: process.env.USER }, newUser.email, "Dobrodošli u Quizko aplikaciju!", html);
         try {
             await sendMail(transporter, mailOptions);
         }
@@ -48,7 +39,7 @@ exports.register = async function (req, res, next) {
             return next(new ApiError("E-mail se nije uspio poslati. Pokušajte ponovno.", 500));
         }
 
-        res.cookie("jwt", token, cookieOptions).status(201).json({
+        res.cookie("jwt", token, cookie).status(201).json({
             status: 'success',
             data: newUser,
             token
@@ -69,13 +60,13 @@ exports.confirmEmailAddress = async function (req, res, next) {
         if (user.email_confirmation_token !== req.params.token) {
             user.email_confirmation_token = undefined;
             user.has_confirmed_email = false;
-            await user.save();
+            await user.save({ validateModifiedOnly: true });
             throw new ApiError("Tokeni se ne podudaraju. Ponovno pošaljite e-mail za aktivaciju računa.", 400);
         }
 
         user.email_confirmation_token = undefined;
         user.has_confirmed_email = true;
-        await user.save();
+        await user.save({ validateModifiedOnly: true });
 
 
         res.status(200).json({
@@ -96,18 +87,11 @@ exports.resendEmail = async function (req, res, next) {
 
         user.email_confirmation_token = emailToken;
         user.has_confirmed_email = false;
-        await user.save();
+        await user.save({ validateModifiedOnly: true });
 
-        const mailOptions = {
-            from: {
-                name: 'Quizko edIT',
-                address: process.env.USER
-            },
-            to: user.email,
-            subject: "E-mail za aktivaciju računa",
-            html: `<p>Klikom na sljedeći <a href="${process.env.RENDER_HOST_EMAIL}/${user._id}/${emailToken}">link</a> možete aktivirati svoj račun.</p>`
-        }
 
+        const html = `<p>Klikom na sljedeći <a href="${process.env.RENDER_HOST_EMAIL}/${user._id}/${emailToken}">link</a> možete aktivirati svoj račun.</p>`;
+        const mailOptions = new Options({ name: 'Quizko edIT', address: process.env.USER }, user.email, "E-mail za aktivaciju računa", html);
         try {
             await sendMail(transporter, mailOptions);
         }
@@ -135,18 +119,11 @@ exports.forgotPassword = async function (req, res, next) {
         const token = RandomToken();
         user.passwordResetToken = token;
         user.password_token_expires_at = Date.now() + (5 * 1000 * 60);
-        await user.save();
+        await user.save({ validateModifiedOnly: true });
 
-        const mailOptions = {
-            from: {
-                name: 'Quizko edIT',
-                address: process.env.USER
-            },
-            to: user.email,
-            subject: "E-mail za oporavak lozinke",
-            html: `<p>Klikom na sljedeći <a href="${process.env.RENDER_HOST_PASSWORD}/${user._id}/${token}">link</a> možete oporaviti svoju lozinku.</p>`
-        }
 
+        const html = `<p>Klikom na sljedeći <a href="${process.env.RENDER_HOST_PASSWORD}/${user._id}/${token}">link</a> možete oporaviti svoju lozinku.</p>`;
+        const mailOptions = new Options({ name: 'Quizko edIT', address: process.env.USER }, user.email, "E-mail za oporavak lozinke", html);
         try {
             await sendMail(transporter, mailOptions);
         }
@@ -171,7 +148,7 @@ exports.resetPassword = async function (req, res, next) {
 
         if (user.passwordResetToken !== req.params.token) {
             user.passwordResetToken = undefined;
-            await user.save();
+            await user.save({ validateModifiedOnly: true });
             throw new ApiError("Tokeni se ne podudaraju. Ponovno pošaljite e-mail za oporavak lozinke.", 400);
         }
         if (user.password_token_expires_at < Date.now()) throw new ApiError("Token za oporavak lozinke je istekao. Molimo Vas ponovno pošaljite e-mail za oporavak lozinke.", 400);
@@ -185,7 +162,7 @@ exports.resetPassword = async function (req, res, next) {
         user.passwordConfirm = password_confirm;
         user.passwordResetToken = undefined;
         user.password_token_expires_at = undefined;
-        await user.save();
+        await user.save({ validateModifiedOnly: true });
 
 
         res.status(200).json({
@@ -202,7 +179,7 @@ exports.resetPassword = async function (req, res, next) {
 //Prijava
 exports.logIn = async function (req, res, next) {
     try {
-
+        const cookie = new Cookie('', '');
         const { email, password } = req.body;
         if (!email || !password) throw new ApiError("Morate unjeti e-mail i lozinku prilikom prijave.", 400);
 
@@ -211,8 +188,8 @@ exports.logIn = async function (req, res, next) {
 
 
         const token = signToken(user.id);
-        if (isProductionEnv()) cookieOptions.secure = true;
-        res.cookie("jwt", token, cookieOptions).status(200).json({
+        if (isProductionEnv()) cookie._setAttributes();
+        res.cookie("jwt", token, cookie).status(200).json({
             status: 'success',
             user,
             token
@@ -248,6 +225,7 @@ exports.getMyProfile = async function (req, res, next) {
 //Update profila
 exports.updateMe = async function (req, res, next) {
     try {
+        const cookie = new Cookie('', '');
         const user = await User.findByIdAndUpdate(req.user.id, {
             username: req.body.username,
             email: req.body.email
@@ -259,8 +237,8 @@ exports.updateMe = async function (req, res, next) {
         if (!user) throw new ApiError("Korisnik nije pronađen.", 404);
 
         const token = signToken(user._id);
-        if (isProductionEnv()) cookieOptions.secure = true;
-        res.cookie("jwt", token, cookieOptions).status(200).json({
+        if (isProductionEnv()) cookie._setAttributes();
+        res.cookie("jwt", token, cookie).status(200).json({
             status: 'success',
             user,
             token
@@ -275,6 +253,7 @@ exports.updateMe = async function (req, res, next) {
 //Promjena lozinke
 exports.changePassword = async function (req, res, next) {
     try {
+        const cookie = new Cookie('', '');
         const { password, passwordNew, passwordRepeat } = req.body;
         if (!password || !passwordNew || !passwordRepeat) throw new ApiError('Morate unjeti svoju trenutnu lozinku, novu lozinku, te ponoviti novu lozinku.', 400);
         const user = await User.findOne({ _id: req.user.id }).select("+password");
@@ -286,11 +265,11 @@ exports.changePassword = async function (req, res, next) {
 
 
         const token = signToken(user._id);
-        if (isProductionEnv()) cookieOptions.secure = true;
+        if (isProductionEnv()) cookie._setAttributes();
 
 
         await user.save({ validateModifiedOnly: true });
-        res.status(200).cookie('jwt', token, cookieOptions).json({
+        res.status(200).cookie('jwt', token, cookie).json({
             status: 'success',
             token,
             message: 'Lozinka uspješno promjenjena.'
