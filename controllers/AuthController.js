@@ -61,9 +61,9 @@ exports.register = async function (req, res, next) {
 
 
 exports.confirmEmailAddress = async function (req, res, next) {
-    let user;
     try {
-        user = await User.findById(req.params.id);
+        const user = await User.findById(req.params.id);
+        if (user.hasConfirmedEmail(user)) return next(new ApiError("Vaša e-mail adresa je već potvrđena.", 400));
         if (!user) throw new ApiError("Korisnik ne postoji.", 404);
 
         if (user.email_confirmation_token !== req.params.token) {
@@ -91,6 +91,7 @@ exports.confirmEmailAddress = async function (req, res, next) {
 exports.resendEmail = async function (req, res, next) {
     try {
         const user = await User.findById(req.user.id);
+        if (user.hasConfirmedEmail(user)) throw new ApiError("Vaša e-mail adresa je već potvrđena.", 400);
         const emailToken = RandomToken();
 
         user.email_confirmation_token = emailToken;

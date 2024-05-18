@@ -81,6 +81,7 @@ userSchema.methods.comparePw = async function (providedPw, storedPw) {
 }
 userSchema.methods.hasCreatedQuiz = (user, quiz) => user.id === quiz.created_by.toString();
 userSchema.methods.hasCreatedTeam = (user, team) => user.id === team.created_by.toString();
+userSchema.methods.hasConfirmedEmail = (user) => user.has_confirmed_email === true;
 
 const User = mongoose.model('User', userSchema);
 module.exports = User;
