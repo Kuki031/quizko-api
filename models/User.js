@@ -60,7 +60,7 @@ const userSchema = new mongoose.Schema({
         default: 'Guest'
     },
     passwordResetToken: String,
-
+    password_token_expires_at: Date
 }, {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },

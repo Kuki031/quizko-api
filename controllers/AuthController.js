@@ -134,6 +134,7 @@ exports.forgotPassword = async function (req, res, next) {
 
         const token = RandomToken();
         user.passwordResetToken = token;
+        user.password_token_expires_at = Date.now() + (5 * 1000 * 60);
         await user.save();
 
         const mailOptions = {
@@ -173,6 +174,7 @@ exports.resetPassword = async function (req, res, next) {
             await user.save();
             throw new ApiError("Tokeni se ne podudaraju. Ponovno pošaljite e-mail za oporavak lozinke.", 400);
         }
+        if (user.password_token_expires_at < Date.now()) throw new ApiError("Token za oporavak lozinke je istekao. Molimo Vas ponovno pošaljite e-mail za oporavak lozinke.", 400);
 
         const password_new = req.body.password_new;
         const password_confirm = req.body.password_confirm;
@@ -182,6 +184,7 @@ exports.resetPassword = async function (req, res, next) {
         user.password = password_new;
         user.passwordConfirm = password_confirm;
         user.passwordResetToken = undefined;
+        user.password_token_expires_at = undefined;
         await user.save();
 
 

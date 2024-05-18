@@ -35,7 +35,9 @@ const quizSchema = new mongoose.Schema({
     },
     num_of_rounds: {
         type: Number,
-        required: [true, "Morate unjeti broj rundi"]
+        required: [true, "Morate unjeti broj rundi."],
+        max: [20, "Maksimalno je moguće unjeti 20 rundi."],
+        min: [1, "Minimalan broj rundi po kvizu je 1 runda."]
     },
     scoreboard: {
         name: String,
