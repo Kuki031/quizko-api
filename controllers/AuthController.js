@@ -117,7 +117,77 @@ exports.resendEmail = async function (req, res, next) {
 
         res.status(200).json({
             status: 'success',
-            message: "E-mail uspješno poslan."
+            message: "E-mail za aktivaciju računa uspješno poslan."
+        })
+    }
+    catch (err) {
+        return next(err);
+    }
+}
+
+
+exports.forgotPassword = async function (req, res, next) {
+    try {
+        const user = await User.findOne({ email: req.body.email });
+        if (!user) throw new ApiError(`Korisnik sa e-mail adresom "${req.body.email}" ne postoji.`, 404);
+        if (!user.has_confirmed_email) throw new ApiError("E-mail adresa nije potvrđena, nije moguće poslati e-mail.", 403);
+
+        const token = RandomToken();
+        user.passwordResetToken = token;
+        await user.save();
+
+        const mailOptions = {
+            from: {
+                name: 'Quizko edIT',
+                address: process.env.USER
+            },
+            to: user.email,
+            subject: "E-mail za oporavak lozinke",
+            html: `<p>Klikom na sljedeći <a href="${process.env.RENDER_HOST_PASSWORD}/${user._id}/${token}">link</a> možete oporaviti svoju lozinku.</p>`
+        }
+
+        try {
+            await sendMail(transporter, mailOptions);
+        }
+        catch (err) {
+            return next(new ApiError("E-mail se nije uspio poslati. Pokušajte ponovno.", 500));
+        }
+
+        res.status(200).json({
+            status: 'success',
+            message: 'E-mail za oporavak lozinke uspješno poslan.'
+        })
+    }
+    catch (err) {
+        return next(err);
+    }
+}
+
+exports.resetPassword = async function (req, res, next) {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) throw new ApiError("Korisnik ne postoji.", 404);
+
+        if (user.passwordResetToken !== req.params.token) {
+            user.passwordResetToken = undefined;
+            await user.save();
+            throw new ApiError("Tokeni se ne podudaraju. Ponovno pošaljite e-mail za oporavak lozinke.", 400);
+        }
+
+        const password_new = req.body.password_new;
+        const password_confirm = req.body.password_confirm;
+
+        if (password_new !== password_confirm) throw new ApiError("Lozinke se ne podudaraju.", 400);
+
+        user.password = password_new;
+        user.passwordConfirm = password_confirm;
+        user.passwordResetToken = undefined;
+        await user.save();
+
+
+        res.status(200).json({
+            status: 'success',
+            message: 'Lozinka uspješno oporavljena. Možete se prijaviti u aplikaciju.'
         })
     }
     catch (err) {

@@ -59,6 +59,8 @@ const userSchema = new mongoose.Schema({
         enum: ['Administrator', 'Moderator', 'Guest'],
         default: 'Guest'
     },
+    passwordResetToken: String,
+
 }, {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
