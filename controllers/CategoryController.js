@@ -35,6 +35,36 @@ exports.getAllCategories = async function (req, res, next) {
     }
 }
 
+exports.getUserCategories = async function (req, res, next) {
+    try {
+        const userCategories = await Quiz.find({created_by: req.user.id}).select("category");
+        if (!userCategories) throw new ApiError("Niti jedan pronađeni kviz ne posjeduje kategoriju.", 404);
+
+        const categories = [];
+        const categoriesSet = new Set();
+
+        for (const category of userCategories) {
+            if (!categories.has(category)) {
+                categoriesSet.add(category);
+                categories.push(category);
+            }
+        }
+
+        const namedCategories = await Category.find({
+            _id: {
+                $in: categories
+            }
+        })
+
+        res.status(200).json({
+            status: 'success',
+            namedCategories
+        })
+    } catch (err) {
+        return next(err);
+    }
+}
+
 exports.getSingleCategory = async function (req, res, next) {
     try {
         const category = await Category.findById(req.params.id);
