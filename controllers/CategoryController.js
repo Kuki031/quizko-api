@@ -38,17 +38,15 @@ exports.getAllCategories = async function (req, res, next) {
 exports.getUserCategories = async function (req, res, next) {
     try {
         const userCategories = await Quiz.find({created_by: req.user.id}).select("category");
-        if (!userCategories) throw new ApiError("Niti jedan pronađeni kviz ne posjeduje kategoriju.", 404);
+        if (userCategories.length === 0) throw new ApiError("Niti jedan pronađeni kviz ne posjeduje kategoriju.", 404);
 
-        const categories = [];
         const categoriesSet = new Set();
 
         for (const category of userCategories) {
-            if (!categories.has(category)) {
-                categoriesSet.add(category);
-                categories.push(category);
-            }
+            categoriesSet.add(category.category.toString());
         }
+
+        const categories = Array.from(categoriesSet);
 
         const namedCategories = await Category.find({
             _id: {
