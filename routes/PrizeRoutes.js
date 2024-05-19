@@ -3,15 +3,16 @@
 const express = require('express');
 const PrizeController = require('../controllers/PrizeController');
 const isLoggedIn = require('../middlewares/isLoggedIn');
-const restrictAccess = require('../middlewares/restrictAccess');
 const hasConfirmedEmail = require('../middlewares/hasConfirmedEmail');
+const restrictQuizOps = require('../middlewares/restrictQuizOps');
+const hasCreatedQuiz = require('../middlewares/hasCreatedQuiz');
 const prizeRouter = express.Router();
 
 
-prizeRouter.use(isLoggedIn, hasConfirmedEmail, restrictAccess);
+prizeRouter.use(isLoggedIn, hasConfirmedEmail);
 prizeRouter.route('/prizes/:id').get(PrizeController.getPrizesForQuiz);
-prizeRouter.route('/prizes/new-prize/:id').patch(PrizeController.createPrize);
-prizeRouter.route('/prizes/edit-prize/:id').patch(PrizeController.editPrize);
-prizeRouter.route('/prizes/delete-prize/:id').patch(PrizeController.deletePrize);
+prizeRouter.route('/prizes/new-prize/:id').patch(hasCreatedQuiz("id"), PrizeController.createPrize);
+prizeRouter.route('/prizes/edit-prize/:prizeid').patch(restrictQuizOps(["prizeid"], ["prizes._id"]), PrizeController.editPrize);
+prizeRouter.route('/prizes/delete-prize/:prizeid').patch(restrictQuizOps(["prizeid"], ["prizes._id"]), PrizeController.deletePrize);
 
 module.exports = prizeRouter;

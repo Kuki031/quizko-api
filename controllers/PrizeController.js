@@ -26,6 +26,7 @@ exports.getPrizesForQuiz = async function (req, res, next) {
 
 exports.createPrize = async function (req, res, next) {
     try {
+
         const existingPrize = await Quiz.findOne({
             _id: req.params.id,
             "prizes.place": req.body.place
@@ -37,13 +38,17 @@ exports.createPrize = async function (req, res, next) {
             place: req.body.place
         };
 
-        await Quiz.findOneAndUpdate({ _id: req.params.id }, {
+        const updatedQuiz = await Quiz.findOneAndUpdate({ _id: req.params.id }, {
             $push: { "prizes": prize }
+        }, {
+            runValidators: true,
+            new: true
         });
+
 
         res.status(201).json({
             status: 'success',
-            prize
+            updatedQuiz
         })
     }
     catch (err) {
@@ -53,13 +58,13 @@ exports.createPrize = async function (req, res, next) {
 
 exports.editPrize = async function (req, res, next) {
     try {
-        const prize = await Quiz.findOneAndUpdate({ "prizes._id": req.params.id }, {
+
+        const prize = await Quiz.findOneAndUpdate({ "prizes._id": req.params.prizeid }, {
             $set: { "prizes.$.name": req.body.name, "prizes.$.place": req.body.place }
         }, {
             runValidators: true,
             new: true
         });
-
         if (!prize) throw new ApiError(`Nagrada sa ID-em ${req.params.id} ne postoji.`, 404);
 
         res.status(200).json({
@@ -74,11 +79,12 @@ exports.editPrize = async function (req, res, next) {
 
 exports.deletePrize = async function (req, res, next) {
     try {
-        const prize = await Quiz.findOneAndUpdate({ "prizes._id": req.params.id }, {
-            $pull: { prizes: { _id: req.params.id } }
+
+        const prize = await Quiz.findOneAndUpdate({ "prizes._id": req.params.prizeid }, {
+            $pull: { prizes: { _id: req.params.prizeid } }
         });
 
-        if (!prize) throw new ApiError(`Nagrada sa ID-em ${req.params.id} ne postoji.`, 404);
+        if (!prize) throw new ApiError(`Nagrada sa ID-em ${req.params.prizeid} ne postoji.`, 404);
 
         res.status(204).json({
             status: 'success',

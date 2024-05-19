@@ -8,7 +8,6 @@ exports.createNewRoundForQuiz = async function (req, res, next) {
     try {
         const quiz = await Quiz.findById(req.params.id);
         if (!quiz) throw new ApiError("Kviz ne postoji.", 404);
-        if (!req.user.hasCreatedQuiz(req.user, quiz)) throw new ApiError("Niste kreirali ovaj kviz.", 403);
 
         let checkForDups = checkDuplicate(quiz.rounds, req.body)
         if (checkForDups) throw new ApiError(`Runda "${req.body.name}" već postoji.`, 400);

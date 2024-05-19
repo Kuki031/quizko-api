@@ -31,6 +31,31 @@ exports.createTeam = async function (req, res, next) {
     }
 }
 
+exports.createTeamQuizCreator = async function (req, res, next) {
+    try {
+        const checkUser = await User.findById(req.params.id);
+
+        if (!checkUser) throw new ApiError(`Korisnik sa ID-em ${req.params.id} ne postoji.`, 404);
+        if (checkUser.belongs_to_team) throw new ApiError(`Korisnik sa ID-em ${req.params.id} već pripada timu.`, 400);
+
+        const newTeam = await Team.create({
+            name: req.body.name,
+            created_by: req.params.id
+        });
+
+        await User.findByIdAndUpdate(req.params.id, { belongs_to_team: true, team: newTeam._id });
+
+        res.status(201).json({
+            status: 'success',
+            newTeam
+        })
+
+    }
+    catch (err) {
+        return next(err);
+    }
+}
+
 exports.getMyTeam = async function (req, res, next) {
     try {
         const checkUser = await checkTeamState(User, req.user.id, false);

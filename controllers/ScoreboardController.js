@@ -1,5 +1,6 @@
 'use strict'
 
+const User = require('../models/User');
 const Quiz = require('../models/Quiz');
 const Team = require('../models/Team');
 const ApiError = require('../utils/ApiError');
@@ -28,38 +29,43 @@ exports.getScoreboard = async function (req, res, next) {
 }
 
 
-/*exports.createNewTeam = async function (req, res, next) {
+exports.addTeamOnScoreboardManually = async function (req, res, next) {
     try {
 
-        const fetchTeamsForDup = await Quiz.findById(req.params.id).select("scoreboard.teams");
-        const teams = fetchTeamsForDup.scoreboard.teams.find(team => team.name === req.body.name);
-        if (teams) throw new ApiError(`Tim sa imenom ${req.body.name} već postoji.`, 400);
+        const scoreboard = await Quiz.findById(req.params.scoreboard);
+        if (!scoreboard) throw new ApiError(`Kviz sa ID-em ${req.params.scoreboard} ne postoji.`, 404);
+        const teams = scoreboard.scoreboard.teams;
 
-        const newTeam = await Quiz.findByIdAndUpdate(req.params.id, {
-            $push: { "scoreboard.teams": { name: req.body.name }, }, $inc: { "scoreboard.num_of_teams": 1 }
+        const team = await Team.findById(req.params.team);
+        if (!team) throw new ApiError(`Tim sa ID-em ${req.params.team} ne postoji.`, 404);
+        const checkForDups = teams.find(t => t._id.toString() === team._id.toString());
+
+        if (checkForDups) throw new ApiError(`Tim sa imenom ${team.name} već postoji na bodovnoj ljestvici.`, 400);
+
+        const updatedQuiz = await Quiz.findByIdAndUpdate(req.params.scoreboard, {
+            $push: { "scoreboard.teams": req.params.team },
+            $inc: { "scoreboard.num_of_teams": 1 }
         }, {
             runValidators: true,
             new: true
-        }
-        );
+        });
 
-        if (!newTeam) throw new ApiError(`Kviz sa ID-em ${req.params.id} ne postoji.`, 404);
 
-        res.status(201).json({
+        res.status(200).json({
             status: 'success',
-            newTeam
+            updatedQuiz
         })
+
     }
     catch (err) {
         return next(err);
     }
-}*/
+}
 
 
 exports.updateTeamOnScoreboard = async function (req, res, next) {
     try {
-
-        const team = await Team.findByIdAndUpdate(req.params.id, {
+        const team = await Team.findByIdAndUpdate(req.params.teamid, {
             points_earned: req.body.points_earned
         },
             {

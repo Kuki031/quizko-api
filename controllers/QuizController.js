@@ -86,8 +86,6 @@ exports.updateQuiz = async function (req, res, next) {
             new: true
         });
         if (!quiz) throw new ApiError(`Kviz sa ID-em ${req.params.id} ne postoji.`, 404);
-        if (!req.user.hasCreatedQuiz(req.user, quiz)) throw new ApiError("Ne možete pristupiti ovoj lokaciji.", 403);
-
 
         res.status(200).json({
             status: 'success',
@@ -105,8 +103,6 @@ exports.deleteQuiz = async function (req, res, next) {
     try {
         const quiz = await Quiz.findByIdAndDelete(req.params.id)
         if (!quiz) throw new ApiError("Kviz ne postoji.", 404);
-        if (!req.user.hasCreatedQuiz(req.user, quiz)) throw new ApiError("Ne možete pristupiti ovoj lokaciji.", 403);
-
 
         res.status(204).json({
             status: 'success',

@@ -81,7 +81,6 @@ userSchema.pre('save', async function (next) {
 userSchema.methods.comparePw = async function (providedPw, storedPw) {
     return await bcrypt.compare(providedPw, storedPw);
 }
-userSchema.methods.hasCreatedQuiz = (user, quiz) => user.id === quiz.created_by.toString();
 userSchema.methods.hasCreatedTeam = (user, team) => user.id === team.created_by.toString();
 userSchema.methods.hasConfirmedEmail = (user) => user.has_confirmed_email === true;
 
