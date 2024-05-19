@@ -12,8 +12,8 @@ const roundSchema = new mongoose.Schema({
     num_of_questions: {
         type: Number,
         required: [true, "Morate unjeti broj pitanja za rundu."],
-        max: [20, "Maksimalno je moguće unjeti 20 pitanja po rundi."],
-        min: [5, "Minimalan broj pitanja po rundi je 5."]
+        max: [25, "Maksimalno je moguće unjeti 20 pitanja po rundi."],
+        min: [1, "Minimalan broj pitanja po rundi je 1."]
     },
     questions: [
         questionSchema
