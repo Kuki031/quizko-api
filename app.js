@@ -19,6 +19,7 @@ const CategoryRouter = require('./routes/CategoryRoutes');
 const PrizeRouter = require('./routes/PrizeRoutes');
 const TeamRouter = require('./routes/TeamRoutes');
 
+
 const app = express();
 
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
