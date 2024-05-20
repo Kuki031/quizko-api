@@ -11,7 +11,6 @@ const Options = require('../utils/EmailOptions');
 const Cookie = require('../utils/CookieOptions');
 
 
-//Registracija
 exports.register = async function (req, res, next) {
     try {
         const cookie = new Cookie('', '');
@@ -31,7 +30,7 @@ exports.register = async function (req, res, next) {
         <p>Klikom na sljedeći <a href="${process.env.RENDER_HOST_EMAIL}/${newUser._id}/${emailToken}">link</a> možete aktivirati svoj račun.</p>
         <p>Nakon aktivacije računa, možete koristiti sve značajke aplikacije.</p>
         `
-        const mailOptions = new Options({ name: 'Quizko edIT', address: process.env.USER }, newUser.email, "Dobrodošli u Quizko aplikaciju!", html);
+        const mailOptions = new Options({ name: 'Quizko edIT', address: process.env.USER }, newUser.email, `Dobrodošli u Quizko aplikaciju, ${newUser.username}!`, html);
         try {
             await sendMail(transporter, mailOptions);
         }
@@ -176,7 +175,6 @@ exports.resetPassword = async function (req, res, next) {
 }
 
 
-//Prijava
 exports.logIn = async function (req, res, next) {
     try {
         const cookie = new Cookie('', '');
@@ -203,7 +201,6 @@ exports.logIn = async function (req, res, next) {
 
 
 
-//Dohvati moj profil
 exports.getMyProfile = async function (req, res, next) {
 
     try {
@@ -222,19 +219,16 @@ exports.getMyProfile = async function (req, res, next) {
 }
 
 
-//Update profila
 exports.updateMe = async function (req, res, next) {
     try {
         const cookie = new Cookie('', '');
-        const user = await User.findByIdAndUpdate(req.user.id, {
-            username: req.body.username,
-            email: req.body.email
-        }, {
-            runValidators: true,
-            new: true
-        });
+        const user = await User.findById(req.user.id);
 
         if (!user) throw new ApiError("Korisnik nije pronađen.", 404);
+
+        user.username = req.body.username ?? user.username;
+        user.email = req.body.email ?? user.email;
+        await user.save({ validateModifiedOnly: true });
 
         const token = signToken(user._id);
         if (isProductionEnv()) cookie._setAttributes();
@@ -245,12 +239,12 @@ exports.updateMe = async function (req, res, next) {
         });
     }
     catch (err) {
+        console.log(err);
         return next(err);
     }
 }
 
 
-//Promjena lozinke
 exports.changePassword = async function (req, res, next) {
     try {
         const cookie = new Cookie('', '');
@@ -281,7 +275,6 @@ exports.changePassword = async function (req, res, next) {
     }
 }
 
-//Brisanje cijelog profila (iz baze)
 exports.deleteMyAccount = async function (req, res, next) {
     try {
         await User.findByIdAndDelete(req.user.id);
@@ -297,7 +290,6 @@ exports.deleteMyAccount = async function (req, res, next) {
 
 
 
-//Odjava
 exports.logOut = function (req, res) {
     res.cookie('jwt', '', {
         expiresIn: new Date(Date.now() + 10 * 1000),
