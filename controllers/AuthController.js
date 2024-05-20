@@ -1,6 +1,7 @@
 'use strict'
 
 require('dotenv').config({ path: './config.env' });
+const pug = require('pug');
 const User = require('../models/User');
 const ApiError = require('../utils/ApiError');
 const { transporter, sendMail } = require('../utils/Nodemailer')
@@ -24,19 +25,6 @@ exports.register = async function (req, res, next) {
         });
         const token = signToken(newUser._id);
         if (isProductionEnv()) cookie._setAttributes();
-
-        const html = `
-        <h2>Uspješno ste se registrirali u aplikaciju</h2>
-        <p>Klikom na sljedeći <a href="${process.env.RENDER_HOST_EMAIL}/${newUser._id}/${emailToken}">link</a> možete aktivirati svoj račun.</p>
-        <p>Nakon aktivacije računa, možete koristiti sve značajke aplikacije.</p>
-        `
-        const mailOptions = new Options({ name: 'Quizko edIT', address: process.env.USER }, newUser.email, `Dobrodošli u Quizko aplikaciju, ${newUser.username}!`, html);
-        try {
-            await sendMail(transporter, mailOptions);
-        }
-        catch (err) {
-            return next(new ApiError("E-mail se nije uspio poslati. Pokušajte ponovno.", 500));
-        }
 
         res.cookie("jwt", token, cookie).status(201).json({
             status: 'success',
@@ -88,8 +76,18 @@ exports.resendEmail = async function (req, res, next) {
         user.has_confirmed_email = false;
         await user.save({ validateModifiedOnly: true });
 
-
-        const html = `<p>Klikom na sljedeći <a href="${process.env.RENDER_HOST_EMAIL}/${user._id}/${emailToken}">link</a> možete aktivirati svoj račun.</p>`;
+        const compiledFunction = pug.compileFile('./public/emails/email.pug');
+        const html = compiledFunction(
+            {
+                heading: `Dobrodošli u Quizko aplikaciju, ${user.username}!`,
+                par_1: `Kako bi ste mogli dalje koristiti aplikaciju, morate potvrditi svoju e-mail adresu.`,
+                par_2: `Nakon potvrde e-maila, možete koristiti sve značajke aplikacije.`,
+                anchor: `Potvrdi e-mail adresu`,
+                name: user.username,
+                link: process.env.RENDER_HOST_EMAIL,
+                user_id: user._id,
+                token: user.email_confirmation_token
+            })
         const mailOptions = new Options({ name: 'Quizko edIT', address: process.env.USER }, user.email, "E-mail za aktivaciju računa", html);
         try {
             await sendMail(transporter, mailOptions);
@@ -121,7 +119,18 @@ exports.forgotPassword = async function (req, res, next) {
         await user.save({ validateModifiedOnly: true });
 
 
-        const html = `<p>Klikom na sljedeći <a href="${process.env.RENDER_HOST_PASSWORD}/${user._id}/${token}">link</a> možete oporaviti svoju lozinku.</p>`;
+        const compiledFunction = pug.compileFile('./public/emails/email.pug');
+        const html = compiledFunction(
+            {
+                heading: `E-mail za oporavak lozinke`,
+                par_1: `Kako bi ste bili preusmjereni na resetiranje lozinke, `,
+                par_2: `potrebno je kliknuti na sljedeći link: `,
+                anchor: `Resetiraj lozinku`,
+                name: user.username,
+                link: process.env.RENDER_HOST_EMAIL,
+                user_id: user._id,
+                token: user.passwordResetToken
+            })
         const mailOptions = new Options({ name: 'Quizko edIT', address: process.env.USER }, user.email, "E-mail za oporavak lozinke", html);
         try {
             await sendMail(transporter, mailOptions);

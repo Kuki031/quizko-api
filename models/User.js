@@ -1,11 +1,13 @@
 'use strict'
 
 require('dotenv').config({ path: './config.env' });
+const pug = require('pug');
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
 const bcrypt = require('bcryptjs');
 const validator = require('validator');
 const RandomToken = require('../utils/RandomToken');
+const ApiError = require('../utils/ApiError');
 const { transporter, sendMail } = require('../utils/Nodemailer');
 const Options = require('../utils/EmailOptions');
 
@@ -83,14 +85,45 @@ userSchema.pre('save', async function (next) {
 
 userSchema.pre('save', async function (next) {
     try {
-        if (this.isModified("email")) {
-            console.log(this.email);
+
+        if (!this.isModified("email")) return next();
+        if (this.isNew) {
+            const compiledFunction = pug.compileFile('./public/emails/email.pug');
+            const html = compiledFunction(
+                {
+                    heading: `Dobrodošli u Quizko aplikaciju, ${this.username}!`,
+                    par_1: `Kako bi ste mogli dalje koristiti aplikaciju, morate potvrditi svoju e-mail adresu.`,
+                    par_2: `Nakon potvrde e-maila, možete koristiti sve značajke aplikacije.`,
+                    anchor: `Potvrdi e-mail adresu`,
+                    name: this.username,
+                    link: process.env.RENDER_HOST_EMAIL,
+                    user_id: this._id,
+                    token: this.email_confirmation_token
+                })
+            const mailOptions = new Options({ name: 'Quizko edIT', address: process.env.USER }, this.email, `Dobrodošli u Quizko aplikaciju, ${this.username}!`, html);
+            try {
+                await sendMail(transporter, mailOptions);
+            }
+            catch (err) {
+                return next(new ApiError("E-mail se nije uspio poslati. Pokušajte ponovno.", 500));
+            }
+        }
+
+        else if (this.isModified("email") && !this.isNew) {
             const token = RandomToken();
-            const html = `
-                <h2>Promjena E-mail adrese</h2>
-                <p>Klikom na sljedeći <a href="${process.env.RENDER_HOST_EMAIL}/${this._id}/${token}">link</a> morate potvrditi svoju e-mail adresu.</p>
-                <p>Nakon potvrde novog e-maila, možete koristiti sve značajke aplikacije.</p>
-                `
+            const compiledFunction = pug.compileFile('./public/emails/email.pug');
+            const html = compiledFunction(
+                {
+                    heading: `Promjena e-mail adrese za račun "${this.username}"`,
+                    par_1: `Kako bi ste mogli dalje koristiti aplikaciju, morate potvrditi svoju novu e-mail adresu.`,
+                    par_2: `Nakon potvrde nove e-mail adrese, možete dalje koristiti sve značajke aplikacije.`,
+                    anchor: `Potvrdi e-mail adresu`,
+                    name: this.username,
+                    link: process.env.RENDER_HOST_EMAIL,
+                    user_id: this._id,
+                    token: token
+                }
+            );
             const mailOptions = new Options({ name: 'Quizko edIT', address: process.env.USER }, this.email, `Promjena e-mail adrese za ${this.username}`, html);
             try {
                 await sendMail(transporter, mailOptions);
@@ -101,13 +134,12 @@ userSchema.pre('save', async function (next) {
             this.has_confirmed_email = false;
             this.email_confirmation_token = token;
         }
+        next();
     }
     catch (err) {
         return next(err);
     }
-    next();
 })
-
 
 userSchema.methods.comparePw = async function (providedPw, storedPw) {
     return await bcrypt.compare(providedPw, storedPw);
