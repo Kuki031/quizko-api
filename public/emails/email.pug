@@ -5,18 +5,18 @@ html
     meta(name="viewport" content="width=device-width, initial-scale=1.0")
     style.
       body {
-        background-color: rgb(240, 240, 240);
-        color: #3c3c3c;
+        background-color: #3c3c3c;
+        color: #ffffff;
         font-family: Arial, sans-serif;
         padding: 20px;
       }
 
       .container {
-        background-color: #ffffff;
+        background-color: #3c3c3c;
         border-radius: 8px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         margin: 0 auto;
-        max-width: 600px;
+        max-width: 80%;
         padding: 20px;
       }
 
@@ -29,19 +29,22 @@ html
       }
 
       .content {
+        font-size: 21px;
         padding: 20px;
       }   
 
       a {
-        color: #e1bf57;
+        color: #fff;
         text-decoration: none;
+        list-style:none;
+        font-weight:600;
       }
 
       .button {
         background-color: #e1bf57;
         border: none;
         border-radius: 5px;
-        color: #3c3c3c;
+        color: #fff;
         display: inline-block;
         margin-top: 20px;
         padding: 10px 20px;
@@ -55,7 +58,22 @@ html
         color: rgb(255, 255, 255);
         padding: 10px;
         text-align: center;
+        font-size: 1.3em;
       }
+
+      .footer span.white {
+        color: #ffffff;
+      }
+
+      .footer span.it {
+        color: #e1bf57;
+        font-size: 1.2em;
+      }
+
+      .content {
+        color: #ffffff;
+      }
+
   body
     .container
       .header
@@ -64,5 +82,7 @@ html
         div= `${content}`
         a.button(href=`${link}/${user}/${token}`)= `${anchor}`
       .footer
-        p © 2024 Quizko edIT
-        
+        p
+          span.white © 2024 Udruga
+          | &nbsp;
+          span.it ed<span class="white">IT</span>

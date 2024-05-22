@@ -85,7 +85,8 @@ exports.resendEmail = async function (req, res, next) {
         const html = compiledFunction(prepareTemplate._prepareForCompileFunction());
 
 
-        const mailOptions = new Options({ name: 'Quizko edIT', address: process.env.USER }, user.email, "E-mail za aktivaciju računa", html);
+        const mailOptions = new Options({ name: 'Quizko edIT', address: process.env.USER }, user.email, "E-mail za aktivaciju računa", html)
+            ._bindAttachments();
         try {
             await sendMail(transporter, mailOptions);
         }
@@ -99,7 +100,6 @@ exports.resendEmail = async function (req, res, next) {
         })
     }
     catch (err) {
-        console.log(err);
         return next(err);
     }
 }
@@ -124,7 +124,8 @@ exports.forgotPassword = async function (req, res, next) {
         const html = compiledFunction(prepareTemplate._prepareForCompileFunction());
 
 
-        const mailOptions = new Options({ name: 'Quizko edIT', address: process.env.USER }, user.email, "E-mail za oporavak lozinke", html);
+        const mailOptions = new Options({ name: 'Quizko edIT', address: process.env.USER }, user.email, "E-mail za oporavak lozinke", html)
+            ._bindAttachments();
         try {
             await sendMail(transporter, mailOptions);
         }

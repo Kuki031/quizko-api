@@ -1,5 +1,6 @@
 'use strict'
 
+const path = require('path');
 require('dotenv').config({ path: './config.env' });
 const pug = require('pug');
 const mongoose = require('mongoose');
@@ -97,8 +98,8 @@ userSchema.pre('save', async function (next) {
                 ._setCredentials({ link: process.env.RENDER_HOST_EMAIL, user: this._id, token: this.email_confirmation_token });
             const html = compiledFunction(prepareTemplate._prepareForCompileFunction());
 
-
-            const mailOptions = new Options({ name: 'Quizko edIT', address: process.env.USER }, this.email, `Dobrodošli u Quizko aplikaciju, ${this.username}!`, html);
+            const mailOptions = new Options({ name: 'Quizko edIT', address: process.env.USER }, this.email, `Dobrodošli u Quizko aplikaciju, ${this.username}!`, html)
+                ._bindAttachments();
             try {
                 await sendMail(transporter, mailOptions);
             }
@@ -114,11 +115,12 @@ userSchema.pre('save', async function (next) {
             const compiledFunction = pug.compileFile('./public/emails/email.pug');
             const prepareTemplate = new Template(this.username)
                 ._setTemplate("resend")
-                ._setCredentials({ link: process.env.RENDER_HOST_EMAIL, user: this._id, token: this.email_confirmation_token });
+                ._setCredentials({ link: process.env.RENDER_HOST_EMAIL, user: this._id, token: token });
             const html = compiledFunction(prepareTemplate._prepareForCompileFunction());
 
 
-            const mailOptions = new Options({ name: 'Quizko edIT', address: process.env.USER }, this.email, `Promjena e-mail adrese za ${this.username}`, html);
+            const mailOptions = new Options({ name: 'Quizko edIT', address: process.env.USER }, this.email, `Promjena e-mail adrese za ${this.username}`, html)
+                ._bindAttachments();
             try {
                 await sendMail(transporter, mailOptions);
             }
