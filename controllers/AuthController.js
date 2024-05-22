@@ -10,6 +10,7 @@ const isProductionEnv = require('../utils/IsProduction');
 const signToken = require('../utils/SignToken');
 const Options = require('../utils/EmailOptions');
 const Cookie = require('../utils/CookieOptions');
+const Template = require('../utils/EmailTemplate');
 
 
 exports.register = async function (req, res, next) {
@@ -76,18 +77,14 @@ exports.resendEmail = async function (req, res, next) {
         user.has_confirmed_email = false;
         await user.save({ validateModifiedOnly: true });
 
+
         const compiledFunction = pug.compileFile('./public/emails/email.pug');
-        const html = compiledFunction(
-            {
-                heading: `Dobrodošli u Quizko aplikaciju, ${user.username}!`,
-                par_1: `Kako bi ste mogli dalje koristiti aplikaciju, morate potvrditi svoju e-mail adresu.`,
-                par_2: `Nakon potvrde e-maila, možete koristiti sve značajke aplikacije.`,
-                anchor: `Potvrdi e-mail adresu`,
-                name: user.username,
-                link: process.env.RENDER_HOST_EMAIL,
-                user_id: user._id,
-                token: user.email_confirmation_token
-            })
+        const prepareTemplate = new Template(user.username)
+            ._setTemplate("welcome")
+            ._setCredentials({ link: process.env.RENDER_HOST_EMAIL, user: user._id, token: emailToken });
+        const html = compiledFunction(prepareTemplate._prepareForCompileFunction());
+
+
         const mailOptions = new Options({ name: 'Quizko edIT', address: process.env.USER }, user.email, "E-mail za aktivaciju računa", html);
         try {
             await sendMail(transporter, mailOptions);
@@ -102,6 +99,7 @@ exports.resendEmail = async function (req, res, next) {
         })
     }
     catch (err) {
+        console.log(err);
         return next(err);
     }
 }
@@ -120,17 +118,12 @@ exports.forgotPassword = async function (req, res, next) {
 
 
         const compiledFunction = pug.compileFile('./public/emails/email.pug');
-        const html = compiledFunction(
-            {
-                heading: `E-mail za oporavak lozinke`,
-                par_1: `Kako bi ste bili preusmjereni na resetiranje lozinke, `,
-                par_2: `potrebno je kliknuti na sljedeći link: `,
-                anchor: `Resetiraj lozinku`,
-                name: user.username,
-                link: process.env.RENDER_HOST_EMAIL,
-                user_id: user._id,
-                token: user.passwordResetToken
-            })
+        const prepareTemplate = new Template()
+            ._setTemplate("forgot-password")
+            ._setCredentials({ link: process.env.RENDER_HOST_EMAIL, user: user._id, token: token });
+        const html = compiledFunction(prepareTemplate._prepareForCompileFunction());
+
+
         const mailOptions = new Options({ name: 'Quizko edIT', address: process.env.USER }, user.email, "E-mail za oporavak lozinke", html);
         try {
             await sendMail(transporter, mailOptions);
@@ -248,7 +241,6 @@ exports.updateMe = async function (req, res, next) {
         });
     }
     catch (err) {
-        console.log(err);
         return next(err);
     }
 }

@@ -10,6 +10,7 @@ html
         font-family: Arial, sans-serif;
         padding: 20px;
       }
+
       .container {
         background-color: #ffffff;
         border-radius: 8px;
@@ -18,6 +19,7 @@ html
         max-width: 600px;
         padding: 20px;
       }
+
       .header {
         background-color: #e1bf57;
         border-radius: 8px 8px 0 0;
@@ -25,14 +27,16 @@ html
         padding: 20px;
         text-align: center;
       }
+
       .content {
         padding: 20px;
-      }
+      }   
+
       a {
         color: #e1bf57;
         text-decoration: none;
-        list-style:none;
       }
+
       .button {
         background-color: #e1bf57;
         border: none;
@@ -44,6 +48,7 @@ html
         text-align: center;
         text-decoration: none;
       }
+
       .footer {
         background-color: #3c3c3c;
         border-radius: 0 0 8px 8px;
@@ -51,14 +56,13 @@ html
         padding: 10px;
         text-align: center;
       }
-
   body
     .container
       .header
-        h2=`${heading}`
+        h1= `${heading}`
       .content
-        p= `${par_1}`
-        p= `${par_2}`
-        a.button(href=`${link}/${user_id}/${token}`)= `${anchor}`
+        div= `${content}`
+        a.button(href=`${link}/${user}/${token}`)= `${anchor}`
       .footer
         p © 2024 Quizko edIT
+        

@@ -1,5 +1,6 @@
 'use strict'
 
+const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
@@ -44,7 +45,7 @@ app.use(hpp({
     whitelist: ["page", "limit"]
 }))
 
-
+app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/v1/users', UserRouter);
 app.use('/api/v1/teams', TeamRouter);
 app.use('/api/v1/quizzes', QuizRouter, RoundRouter, QuestionRouter, AnswerRouter, PrizeRouter);
