@@ -24,5 +24,6 @@ UserRouter.route('/update-me').patch(AuthController.updateMe);
 UserRouter.route('/change-password').patch(AuthController.changePassword);
 UserRouter.route('/delete-me').delete(AuthController.deleteMyAccount);
 
+
 module.exports = UserRouter;
 

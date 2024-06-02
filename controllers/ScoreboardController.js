@@ -34,11 +34,11 @@ exports.addTeamOnScoreboardManually = async function (req, res, next) {
 
         const scoreboard = await Quiz.findById(req.params.scoreboard);
         if (!scoreboard) throw new ApiError(`Kviz sa ID-em ${req.params.scoreboard} ne postoji.`, 404);
-        const teams = scoreboard.scoreboard.teams;
+        const teams = await scoreboard.scoreboard.populate("teams");
 
         const team = await Team.findById(req.params.team);
         if (!team) throw new ApiError(`Tim sa ID-em ${req.params.team} ne postoji.`, 404);
-        const checkForDups = teams.find(t => t._id.toString() === team._id.toString());
+        const checkForDups = teams.teams.find(t => t.name === team.name);
 
         if (checkForDups) throw new ApiError(`Tim sa imenom ${team.name} već postoji na bodovnoj ljestvici.`, 400);
 
@@ -50,6 +50,7 @@ exports.addTeamOnScoreboardManually = async function (req, res, next) {
             new: true
         });
 
+        await User.findOneAndUpdate({ team: req.params.team }, { is_in_quiz: true, quiz_id: req.params.scoreboard });
 
         res.status(200).json({
             status: 'success',

@@ -15,6 +15,11 @@ const teamSchema = new mongoose.Schema({
     created_by: {
         type: mongoose.Schema.ObjectId,
         ref: 'User'
+    },
+    capacity: {
+        type: Number,
+        min: 1,
+        max: 4
     }
 }, {
     toJSON: { virtuals: true },

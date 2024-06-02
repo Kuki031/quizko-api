@@ -6,41 +6,17 @@ const Team = require('../models/Team');
 const ApiError = require('../utils/ApiError');
 const checkTeamState = require('../utils/checkTeamState');
 
-
-
-exports.createTeam = async function (req, res, next) {
-    try {
-
-        const checkUser = await checkTeamState(User, req.user.id, true);
-        if (checkUser) throw new ApiError("Već pripadate timu.", 400);
-
-        const newTeam = await Team.create({
-            name: req.body.name,
-            created_by: req.user.id
-        })
-
-        await User.findByIdAndUpdate(req.user.id, { belongs_to_team: true, team: newTeam._id });
-
-        res.status(201).json({
-            status: 'success',
-            newTeam
-        });
-    }
-    catch (err) {
-        return next(err);
-    }
-}
-
 exports.createTeamQuizCreator = async function (req, res, next) {
     try {
-        const checkUser = await User.findById(req.params.id);
+        const checkUser = await User.findOne({ username: req.params.username });
 
-        if (!checkUser) throw new ApiError(`Korisnik sa ID-em ${req.params.id} ne postoji.`, 404);
-        if (checkUser.belongs_to_team) throw new ApiError(`Korisnik sa ID-em ${req.params.id} već pripada timu.`, 400);
+        if (!checkUser) throw new ApiError(`Korisnik sa korisničkim imenom ${req.params.username} ne postoji.`, 404);
+        if (checkUser.belongs_to_team) throw new ApiError(`Korisnik sa korisničkim imenom ${req.params.username} već pripada timu.`, 400);
 
         const newTeam = await Team.create({
             name: req.body.name,
-            created_by: req.params.id
+            created_by: checkUser._id,
+            capacity: req.body.capacity
         });
 
         await User.findByIdAndUpdate(req.params.id, { belongs_to_team: true, team: newTeam._id });
@@ -114,7 +90,7 @@ exports.deleteMyTeam = async function (req, res, next) {
         const teamId = req.params.id;
 
         await Promise.all([
-            User.findByIdAndUpdate(req.user.id, { belongs_to_team: false, team: null }),
+            User.findByIdAndUpdate(req.user.id, { belongs_to_team: false, team: null, is_in_quiz: false, quiz_id: null }),
             Quiz.updateMany({ "scoreboard.teams": teamId }, {
                 $pull: { "scoreboard.teams": teamId },
                 $inc: { "scoreboard.num_of_teams": -1 }
@@ -135,31 +111,58 @@ exports.deleteMyTeam = async function (req, res, next) {
 }
 
 
+
 exports.joinQuiz = async function (req, res, next) {
     try {
 
-        const checkUser = await checkTeamState(User, req.user.id, false);
-        if (checkUser) throw new ApiError("Ne pripadate niti jednom timu. Kako biste sudjelovali u kvizu, morate kreirati prvo tim.", 400);
+        let updatedQuiz;
+        let newTeam;
 
-        const user = await User.findById(req.user.id).populate("team");
-        const teamToCheck = user.team.name;
+        const getQuizByPassCode = await Quiz.findOne({ join_code: req.body.join_code });
+        if (!getQuizByPassCode) throw new ApiError(`Kviz sa ovim kodom ne postoji ili je kod neispravan.`, 403);
 
-        const quiz = await Quiz.findById(req.params.id);
-        if (!quiz) throw new ApiError(`Kviz sa ID-em ${req.params.id} ne postoji.`, 404);
+        const user = await User.findById(req.user.id);
 
-        if (quiz.hasReachedDeadline(quiz)) throw new ApiError("Rok za prijavu na kviz je istekao.", 400);
+        if (user.quiz_id) {
+            if (user.quiz_id.toString() === getQuizByPassCode._id.toString()) throw new ApiError(`Već ste prijavljeni na kviz ${getQuizByPassCode.name}.`, 400);
+        }
 
-        const extractTeams = await quiz.scoreboard.populate("teams");
-        const checkForDups = extractTeams.teams.find(x => x.name === teamToCheck);
-        if (checkForDups) throw new ApiError(`Tim "${teamToCheck}" već postoji na bodovnoj ljestvici.`, 400);
+        if (user.belongs_to_team) {
+            const extractTeams = await getQuizByPassCode.scoreboard.populate("teams");
+            const teamToCheck = await User.findById(req.user.id, { team: 1 }).populate("team");
+            const checkForDups = extractTeams.teams.find(x => x.name === teamToCheck.team.name);
+            if (checkForDups) throw new ApiError(`Tim "${teamToCheck.team.name}" već postoji na bodovnoj ljestvici.`, 400);
+            await User.findByIdAndUpdate(req.user.id, { is_in_quiz: true, quiz_id: getQuizByPassCode._id });
+            updatedQuiz = await Quiz.findOneAndUpdate({ join_code: req.body.join_code }, {
+                $push: { "scoreboard.teams": user.team },
+                $inc: { "scoreboard.num_of_teams": 1 }
+            }, {
+                runValidators: true,
+                new: true
+            });
+        } else {
+            newTeam = await Team.create({
+                name: req.body.name,
+                created_by: user.id,
+                capacity: req.body.capacity
+            });
 
-        const updatedQuiz = await Quiz.findByIdAndUpdate(req.params.id, {
-            $push: { "scoreboard.teams": req.user.team },
-            $inc: { "scoreboard.num_of_teams": 1 }
-        }, {
-            runValidators: true,
-            new: true
-        });
+            await User.findByIdAndUpdate(req.user.id, { belongs_to_team: true, team: newTeam._id, is_in_quiz: true, quiz_id: getQuizByPassCode._id });
+
+            const extractTeams = await getQuizByPassCode.scoreboard.populate("teams");
+            const teamToCheck = await User.findById(req.user.id, { team: 1 }).populate("team");
+            const checkForDups = extractTeams.teams.find(x => x.name === teamToCheck.team.name);
+            if (checkForDups) throw new ApiError(`Tim "${teamToCheck.team.name}" već postoji na bodovnoj ljestvici.`, 400);
+
+
+            updatedQuiz = await Quiz.findOneAndUpdate({ join_code: req.body.join_code }, {
+                $push: { "scoreboard.teams": newTeam._id },
+                $inc: { "scoreboard.num_of_teams": 1 }
+            }, {
+                runValidators: true,
+                new: true
+            });
+        }
 
         res.status(200).json({
             status: 'success',
@@ -193,6 +196,8 @@ exports.leaveQuiz = async function (req, res, next) {
             runValidators: true,
             new: true
         });
+
+        await User.findByIdAndUpdate(req.user.id, { is_in_quiz: false, quiz_id: null });
 
         res.status(200).json({
             status: 'success',

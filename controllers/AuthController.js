@@ -12,7 +12,6 @@ const Options = require('../utils/EmailOptions');
 const Cookie = require('../utils/CookieOptions');
 const Template = require('../utils/EmailTemplate');
 
-
 exports.register = async function (req, res, next) {
     try {
         const cookie = new Cookie('', '');

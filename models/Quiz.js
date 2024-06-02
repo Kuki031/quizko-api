@@ -1,6 +1,7 @@
 'use strict'
 
 const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
 const uniqueValidator = require('mongoose-unique-validator');
 const roundSchema = require('./Round');
 const prizeSchema = require('./Prize');
@@ -12,6 +13,10 @@ const quizSchema = new mongoose.Schema({
         trim: true,
         maxLength: 60,
         required: [true, "Morate unjeti ime kviza."]
+    },
+    join_code: {
+        type: String,
+        maxLength: 6
     },
     description: {
         type: String,
@@ -72,6 +77,11 @@ quizSchema.index({ 'rounds._id': 1 });
 quizSchema.index({ 'prizes._id': 1 });
 quizSchema.index({ 'scoreboard._id': 1 });
 quizSchema.plugin(uniqueValidator);
+
+quizSchema.pre('save', function (next) {
+    this.join_code = uuidv4().slice(0, 6);
+    next();
+})
 
 quizSchema.methods.hasReachedDeadline = (quiz) => Date.now() > quiz.date_to_signup.getTime();
 

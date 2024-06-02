@@ -58,6 +58,14 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    is_in_quiz: {
+        type: Boolean,
+        default: false
+    },
+    quiz_id: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Quiz'
+    },
     team: {
         type: mongoose.Schema.ObjectId,
         ref: 'Team'
