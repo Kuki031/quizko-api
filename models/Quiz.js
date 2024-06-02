@@ -60,6 +60,12 @@ const quizSchema = new mongoose.Schema({
     rounds: [
         roundSchema
     ],
+    user_log: [
+        {
+            type: mongoose.Schema.ObjectId,
+            ref: 'User'
+        }
+    ]
 }, {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },

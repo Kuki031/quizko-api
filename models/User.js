@@ -49,27 +49,18 @@ const userSchema = new mongoose.Schema({
         },
         select: false
     },
-    belongs_to_team: {
-        type: Boolean,
-        default: false
-    },
+
     email_confirmation_token: String,
     has_confirmed_email: {
         type: Boolean,
         default: false
     },
-    is_in_quiz: {
-        type: Boolean,
-        default: false
-    },
-    quiz_id: {
-        type: mongoose.Schema.ObjectId,
-        ref: 'Quiz'
-    },
-    team: {
-        type: mongoose.Schema.ObjectId,
-        ref: 'Team'
-    },
+    teams: [
+        {
+            type: mongoose.Schema.ObjectId,
+            ref: 'Team'
+        }
+    ],
     role: {
         type: String,
         enum: ['Administrator', 'Moderator', 'Guest'],
