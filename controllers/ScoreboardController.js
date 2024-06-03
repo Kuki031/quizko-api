@@ -35,28 +35,27 @@ exports.addTeamOnScoreboardManually = async function (req, res, next) {
         const scoreboard = await Quiz.findById(req.params.scoreboard);
         if (!scoreboard) throw new ApiError(`Kviz sa ID-em ${req.params.scoreboard} ne postoji.`, 404);
         const teams = await scoreboard.scoreboard.populate("teams");
-
         const checkForDups = teams.teams.find(t => t.name === req.body.name);
         if (checkForDups) throw new ApiError(`Tim sa imenom ${req.body.name} već postoji na bodovnoj ljestvici.`, 400);
+        const checkIfUserIsLogged = scoreboard.user_log.find(x => x._id.toString() === req.queiredUser.id);
+        if (checkIfUserIsLogged) throw new ApiError(`Korisnik sa korisničkim imenom ${req.queiredUser.username} već ima prijavljen tim na ovom kvizu.`, 403);
 
-        const checkIfUserIsLogged = scoreboard.user_log.find(x => x._id.toString() === req.params.userid);
-        if (checkIfUserIsLogged) throw new ApiError(`Korisnik sa ID-em ${req.params.userid} već ima prijavljen tim na ovom kvizu.`, 403);
 
         const team = await Team.create({
             name: req.body.name,
             capacity: req.body.capacity,
-            created_by: req.params.userid
+            created_by: req.queiredUser.id
         });
 
         const updatedQuiz = await Quiz.findByIdAndUpdate(req.params.scoreboard, {
-            $push: { "scoreboard.teams": team._id, "user_log": req.params.userid },
+            $push: { "scoreboard.teams": team._id, "user_log": req.queiredUser.id },
             $inc: { "scoreboard.num_of_teams": 1 }
         }, {
             runValidators: true,
             new: true
         });
 
-        await User.findByIdAndUpdate(req.params.userid, { $push: { "teams": team._id } });
+        await User.findByIdAndUpdate(req.queiredUser.id, { $push: { "teams": team._id } });
 
         res.status(200).json({
             status: 'success',
